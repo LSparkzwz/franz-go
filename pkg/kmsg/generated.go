@@ -90,6 +90,14 @@ func (v *MessageV0) AppendTo(dst []byte) []byte {
 }
 
 func (v *MessageV0) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *MessageV0) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *MessageV0) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	s := v
@@ -228,6 +236,14 @@ func (v *MessageV1) AppendTo(dst []byte) []byte {
 }
 
 func (v *MessageV1) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *MessageV1) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *MessageV1) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	s := v
@@ -300,11 +316,24 @@ func (v *Header) AppendTo(dst []byte) []byte {
 }
 
 func (v *Header) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *Header) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *Header) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	s := v
 	{
-		v := b.VarintString()
+		var v string
+		if unsafe {
+			v = b.UnsafeVarintString()
+		} else {
+			v = b.VarintString()
+		}
 		s.Key = v
 	}
 	{
@@ -406,6 +435,14 @@ func (v *Record) AppendTo(dst []byte) []byte {
 }
 
 func (v *Record) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *Record) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *Record) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	s := v
@@ -441,15 +478,21 @@ func (v *Record) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]Header, l)
+			a = append(a, make([]Header, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.VarintString()
+				var v string
+				if unsafe {
+					v = b.UnsafeVarintString()
+				} else {
+					v = b.VarintString()
+				}
 				s.Key = v
 			}
 			{
@@ -641,6 +684,14 @@ func (v *RecordBatch) AppendTo(dst []byte) []byte {
 }
 
 func (v *RecordBatch) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *RecordBatch) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *RecordBatch) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	s := v
@@ -758,6 +809,14 @@ func (v *OffsetCommitKey) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetCommitKey) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetCommitKey) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetCommitKey) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -765,11 +824,21 @@ func (v *OffsetCommitKey) ReadFrom(src []byte) error {
 	_ = version
 	s := v
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.Group = v
 	}
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.Topic = v
 	}
 	{
@@ -856,6 +925,14 @@ func (v *OffsetCommitValue) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetCommitValue) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetCommitValue) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetCommitValue) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -871,7 +948,12 @@ func (v *OffsetCommitValue) ReadFrom(src []byte) error {
 		s.LeaderEpoch = v
 	}
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.Metadata = v
 	}
 	{
@@ -926,6 +1008,14 @@ func (v *GroupMetadataKey) AppendTo(dst []byte) []byte {
 }
 
 func (v *GroupMetadataKey) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *GroupMetadataKey) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *GroupMetadataKey) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -933,7 +1023,12 @@ func (v *GroupMetadataKey) ReadFrom(src []byte) error {
 	_ = version
 	s := v
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.Group = v
 	}
 	return b.Complete()
@@ -1100,6 +1195,14 @@ func (v *GroupMetadataValue) AppendTo(dst []byte) []byte {
 }
 
 func (v *GroupMetadataValue) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *GroupMetadataValue) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *GroupMetadataValue) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -1107,7 +1210,12 @@ func (v *GroupMetadataValue) ReadFrom(src []byte) error {
 	_ = version
 	s := v
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.ProtocolType = v
 	}
 	{
@@ -1115,11 +1223,21 @@ func (v *GroupMetadataValue) ReadFrom(src []byte) error {
 		s.Generation = v
 	}
 	{
-		v := b.NullableString()
+		var v *string
+		if unsafe {
+			v = b.UnsafeNullableString()
+		} else {
+			v = b.NullableString()
+		}
 		s.Protocol = v
 	}
 	{
-		v := b.NullableString()
+		var v *string
+		if unsafe {
+			v = b.UnsafeNullableString()
+		} else {
+			v = b.NullableString()
+		}
 		s.Leader = v
 	}
 	if version >= 2 {
@@ -1134,27 +1252,48 @@ func (v *GroupMetadataValue) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]GroupMetadataValueMember, l)
+			a = append(a, make([]GroupMetadataValueMember, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.MemberID = v
 			}
 			if version >= 3 {
-				v := b.NullableString()
+				var v *string
+				if unsafe {
+					v = b.UnsafeNullableString()
+				} else {
+					v = b.NullableString()
+				}
 				s.InstanceID = v
 			}
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.ClientID = v
 			}
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.ClientHost = v
 			}
 			if version >= 1 {
@@ -1218,6 +1357,14 @@ func (v *TxnMetadataKey) AppendTo(dst []byte) []byte {
 }
 
 func (v *TxnMetadataKey) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *TxnMetadataKey) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *TxnMetadataKey) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -1225,7 +1372,12 @@ func (v *TxnMetadataKey) ReadFrom(src []byte) error {
 	_ = version
 	s := v
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.TransactionalID = v
 	}
 	return b.Complete()
@@ -1353,6 +1505,14 @@ func (v *TxnMetadataValue) AppendTo(dst []byte) []byte {
 }
 
 func (v *TxnMetadataValue) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *TxnMetadataValue) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *TxnMetadataValue) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -1388,15 +1548,21 @@ func (v *TxnMetadataValue) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]TxnMetadataValueTopic, l)
+			a = append(a, make([]TxnMetadataValueTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -1407,8 +1573,9 @@ func (v *TxnMetadataValue) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -1582,6 +1749,14 @@ func (v *ConsumerMemberMetadata) AppendTo(dst []byte) []byte {
 }
 
 func (v *ConsumerMemberMetadata) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ConsumerMemberMetadata) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ConsumerMemberMetadata) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -1596,11 +1771,17 @@ func (v *ConsumerMemberMetadata) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
-			v := b.String()
+			var v string
+			if unsafe {
+				v = b.UnsafeString()
+			} else {
+				v = b.String()
+			}
 			a[i] = v
 		}
 		v = a
@@ -1618,15 +1799,21 @@ func (v *ConsumerMemberMetadata) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ConsumerMemberMetadataOwnedPartition, l)
+			a = append(a, make([]ConsumerMemberMetadataOwnedPartition, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -1637,8 +1824,9 @@ func (v *ConsumerMemberMetadata) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -1736,6 +1924,14 @@ func (v *ConsumerMemberAssignment) AppendTo(dst []byte) []byte {
 }
 
 func (v *ConsumerMemberAssignment) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ConsumerMemberAssignment) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ConsumerMemberAssignment) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -1750,15 +1946,21 @@ func (v *ConsumerMemberAssignment) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ConsumerMemberAssignmentTopic, l)
+			a = append(a, make([]ConsumerMemberAssignmentTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -1769,8 +1971,9 @@ func (v *ConsumerMemberAssignment) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -1843,6 +2046,14 @@ func (v *ConnectMemberMetadata) AppendTo(dst []byte) []byte {
 }
 
 func (v *ConnectMemberMetadata) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ConnectMemberMetadata) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ConnectMemberMetadata) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -1850,7 +2061,12 @@ func (v *ConnectMemberMetadata) ReadFrom(src []byte) error {
 	_ = version
 	s := v
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.URL = v
 	}
 	{
@@ -2005,6 +2221,14 @@ func (v *ConnectMemberAssignment) AppendTo(dst []byte) []byte {
 }
 
 func (v *ConnectMemberAssignment) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ConnectMemberAssignment) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ConnectMemberAssignment) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -2016,11 +2240,21 @@ func (v *ConnectMemberAssignment) ReadFrom(src []byte) error {
 		s.Error = v
 	}
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.Leader = v
 	}
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.LeaderURL = v
 	}
 	{
@@ -2035,15 +2269,21 @@ func (v *ConnectMemberAssignment) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ConnectMemberAssignmentAssignment, l)
+			a = append(a, make([]ConnectMemberAssignmentAssignment, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Connector = v
 			}
 			{
@@ -2054,8 +2294,9 @@ func (v *ConnectMemberAssignment) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int16, l)
+					a = append(a, make([]int16, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int16()
@@ -2076,15 +2317,21 @@ func (v *ConnectMemberAssignment) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ConnectMemberAssignmentRevoked, l)
+			a = append(a, make([]ConnectMemberAssignmentRevoked, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Connector = v
 			}
 			{
@@ -2095,8 +2342,9 @@ func (v *ConnectMemberAssignment) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int16, l)
+					a = append(a, make([]int16, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int16()
@@ -2184,6 +2432,14 @@ func (v *DefaultPrincipalData) AppendTo(dst []byte) []byte {
 }
 
 func (v *DefaultPrincipalData) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DefaultPrincipalData) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DefaultPrincipalData) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -2194,19 +2450,35 @@ func (v *DefaultPrincipalData) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Type = v
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Name = v
 	}
@@ -2259,6 +2531,14 @@ func (v *ControlRecordKey) AppendTo(dst []byte) []byte {
 }
 
 func (v *ControlRecordKey) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ControlRecordKey) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ControlRecordKey) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -2312,6 +2592,14 @@ func (v *EndTxnMarker) AppendTo(dst []byte) []byte {
 }
 
 func (v *EndTxnMarker) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *EndTxnMarker) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *EndTxnMarker) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -2434,6 +2722,14 @@ func (v *LeaderChangeMessage) AppendTo(dst []byte) []byte {
 }
 
 func (v *LeaderChangeMessage) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *LeaderChangeMessage) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *LeaderChangeMessage) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	v.Version = b.Int16()
@@ -2458,8 +2754,9 @@ func (v *LeaderChangeMessage) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaderChangeMessageVoter, l)
+			a = append(a, make([]LeaderChangeMessageVoter, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -2488,8 +2785,9 @@ func (v *LeaderChangeMessage) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaderChangeMessageVoter, l)
+			a = append(a, make([]LeaderChangeMessageVoter, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -2717,6 +3015,14 @@ func (v *ProduceRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ProduceRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ProduceRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ProduceRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -2727,9 +3033,17 @@ func (v *ProduceRequest) ReadFrom(src []byte) error {
 	if version >= 3 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.TransactionID = v
 	}
@@ -2753,8 +3067,9 @@ func (v *ProduceRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ProduceRequestTopic, l)
+			a = append(a, make([]ProduceRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -2762,10 +3077,18 @@ func (v *ProduceRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -2781,8 +3104,9 @@ func (v *ProduceRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ProduceRequestTopicPartition, l)
+					a = append(a, make([]ProduceRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -3163,6 +3487,14 @@ func (v *ProduceResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ProduceResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ProduceResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ProduceResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -3182,8 +3514,9 @@ func (v *ProduceResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ProduceResponseTopic, l)
+			a = append(a, make([]ProduceResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -3191,10 +3524,18 @@ func (v *ProduceResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -3210,8 +3551,9 @@ func (v *ProduceResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ProduceResponseTopicPartition, l)
+					a = append(a, make([]ProduceResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -3249,8 +3591,9 @@ func (v *ProduceResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]ProduceResponseTopicPartitionErrorRecord, l)
+							a = append(a, make([]ProduceResponseTopicPartitionErrorRecord, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -3263,9 +3606,17 @@ func (v *ProduceResponse) ReadFrom(src []byte) error {
 							{
 								var v *string
 								if isFlexible {
-									v = b.CompactNullableString()
+									if unsafe {
+										v = b.UnsafeCompactNullableString()
+									} else {
+										v = b.CompactNullableString()
+									}
 								} else {
-									v = b.NullableString()
+									if unsafe {
+										v = b.UnsafeNullableString()
+									} else {
+										v = b.NullableString()
+									}
 								}
 								s.ErrorMessage = v
 							}
@@ -3279,9 +3630,17 @@ func (v *ProduceResponse) ReadFrom(src []byte) error {
 					if version >= 8 {
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.ErrorMessage = v
 					}
@@ -3723,6 +4082,14 @@ func (v *FetchRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *FetchRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *FetchRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *FetchRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -3770,8 +4137,9 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]FetchRequestTopic, l)
+			a = append(a, make([]FetchRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -3779,10 +4147,18 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 			s := v
 			if version >= 0 && version <= 12 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -3802,8 +4178,9 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]FetchRequestTopicPartition, l)
+					a = append(a, make([]FetchRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -3859,8 +4236,9 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]FetchRequestForgottenTopic, l)
+			a = append(a, make([]FetchRequestForgottenTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -3868,10 +4246,18 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 			s := v
 			if version >= 7 && version <= 12 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -3891,8 +4277,9 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -3910,10 +4297,18 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 	}
 	if version >= 11 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Rack = v
 	}
@@ -3926,9 +4321,17 @@ func (v *FetchRequest) ReadFrom(src []byte) error {
 				b := kbin.Reader{Src: b.Span(int(b.Uvarint()))}
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ClusterID = v
 				if err := b.Complete(); err != nil {
@@ -4513,6 +4916,14 @@ func (v *FetchResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *FetchResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *FetchResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *FetchResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -4544,8 +4955,9 @@ func (v *FetchResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]FetchResponseTopic, l)
+			a = append(a, make([]FetchResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -4553,10 +4965,18 @@ func (v *FetchResponse) ReadFrom(src []byte) error {
 			s := v
 			if version >= 0 && version <= 12 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -4576,8 +4996,9 @@ func (v *FetchResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]FetchResponseTopicPartition, l)
+					a = append(a, make([]FetchResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -4618,8 +5039,9 @@ func (v *FetchResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]FetchResponseTopicPartitionAbortedTransaction, l)
+							a = append(a, make([]FetchResponseTopicPartitionAbortedTransaction, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -4969,6 +5391,14 @@ func (v *ListOffsetsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListOffsetsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListOffsetsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListOffsetsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -4996,8 +5426,9 @@ func (v *ListOffsetsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ListOffsetsRequestTopic, l)
+			a = append(a, make([]ListOffsetsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -5005,10 +5436,18 @@ func (v *ListOffsetsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -5024,8 +5463,9 @@ func (v *ListOffsetsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ListOffsetsRequestTopicPartition, l)
+					a = append(a, make([]ListOffsetsRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -5319,6 +5759,14 @@ func (v *ListOffsetsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListOffsetsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListOffsetsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListOffsetsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -5342,8 +5790,9 @@ func (v *ListOffsetsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ListOffsetsResponseTopic, l)
+			a = append(a, make([]ListOffsetsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -5351,10 +5800,18 @@ func (v *ListOffsetsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -5370,8 +5827,9 @@ func (v *ListOffsetsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ListOffsetsResponseTopicPartition, l)
+					a = append(a, make([]ListOffsetsResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -5397,8 +5855,9 @@ func (v *ListOffsetsResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int64, l)
+							a = append(a, make([]int64, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int64()
@@ -5612,6 +6071,14 @@ func (v *MetadataRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *MetadataRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *MetadataRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *MetadataRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -5634,8 +6101,9 @@ func (v *MetadataRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]MetadataRequestTopic, l)
+			a = append(a, make([]MetadataRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -5650,16 +6118,32 @@ func (v *MetadataRequest) ReadFrom(src []byte) error {
 				if version < 10 {
 					var vv string
 					if isFlexible {
-						vv = b.CompactString()
+						if unsafe {
+							vv = b.UnsafeCompactString()
+						} else {
+							vv = b.CompactString()
+						}
 					} else {
-						vv = b.String()
+						if unsafe {
+							vv = b.UnsafeString()
+						} else {
+							vv = b.String()
+						}
 					}
 					v = &vv
 				} else {
 					if isFlexible {
-						v = b.CompactNullableString()
+						if unsafe {
+							v = b.UnsafeCompactNullableString()
+						} else {
+							v = b.CompactNullableString()
+						}
 					} else {
-						v = b.NullableString()
+						if unsafe {
+							v = b.UnsafeNullableString()
+						} else {
+							v = b.NullableString()
+						}
 					}
 				}
 				s.Topic = v
@@ -6081,6 +6565,14 @@ func (v *MetadataResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *MetadataResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *MetadataResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *MetadataResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -6104,8 +6596,9 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]MetadataResponseBroker, l)
+			a = append(a, make([]MetadataResponseBroker, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -6117,10 +6610,18 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Host = v
 			}
@@ -6131,9 +6632,17 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 			if version >= 1 {
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Rack = v
 			}
@@ -6147,9 +6656,17 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 	if version >= 2 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ClusterID = v
 	}
@@ -6169,8 +6686,9 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]MetadataResponseTopic, l)
+			a = append(a, make([]MetadataResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -6183,9 +6701,17 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Topic = v
 			}
@@ -6209,8 +6735,9 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]MetadataResponseTopicPartition, l)
+					a = append(a, make([]MetadataResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -6244,8 +6771,9 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -6266,8 +6794,9 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -6288,8 +6817,9 @@ func (v *MetadataResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -6808,6 +7338,14 @@ func (v *LeaderAndISRRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *LeaderAndISRRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *LeaderAndISRRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -6843,8 +7381,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaderAndISRRequestTopicPartition, l)
+			a = append(a, make([]LeaderAndISRRequestTopicPartition, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -6852,10 +7391,18 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 			s := v
 			if version >= 0 && version <= 1 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -6887,8 +7434,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -6913,8 +7461,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -6935,8 +7484,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -6957,8 +7507,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -6994,8 +7545,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaderAndISRRequestTopicState, l)
+			a = append(a, make([]LeaderAndISRRequestTopicState, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -7003,10 +7555,18 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -7026,8 +7586,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]LeaderAndISRRequestTopicPartition, l)
+					a = append(a, make([]LeaderAndISRRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -7035,10 +7596,18 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 					s := v
 					if version >= 0 && version <= 1 {
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -7070,8 +7639,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -7096,8 +7666,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -7118,8 +7689,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -7140,8 +7712,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -7184,8 +7757,9 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaderAndISRRequestLiveLeader, l)
+			a = append(a, make([]LeaderAndISRRequestLiveLeader, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -7197,10 +7771,18 @@ func (v *LeaderAndISRRequest) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Host = v
 			}
@@ -7387,6 +7969,14 @@ func (v *LeaderAndISRResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *LeaderAndISRResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *LeaderAndISRResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *LeaderAndISRResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -7410,8 +8000,9 @@ func (v *LeaderAndISRResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaderAndISRResponseTopicPartition, l)
+			a = append(a, make([]LeaderAndISRResponseTopicPartition, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -7419,10 +8010,18 @@ func (v *LeaderAndISRResponse) ReadFrom(src []byte) error {
 			s := v
 			if version >= 0 && version <= 4 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -7453,8 +8052,9 @@ func (v *LeaderAndISRResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaderAndISRResponseTopic, l)
+			a = append(a, make([]LeaderAndISRResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -7476,8 +8076,9 @@ func (v *LeaderAndISRResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]LeaderAndISRResponseTopicPartition, l)
+					a = append(a, make([]LeaderAndISRResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -7485,10 +8086,18 @@ func (v *LeaderAndISRResponse) ReadFrom(src []byte) error {
 					s := v
 					if version >= 0 && version <= 4 {
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -7736,6 +8345,14 @@ func (v *StopReplicaRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *StopReplicaRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *StopReplicaRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *StopReplicaRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -7771,8 +8388,9 @@ func (v *StopReplicaRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]StopReplicaRequestTopic, l)
+			a = append(a, make([]StopReplicaRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -7780,10 +8398,18 @@ func (v *StopReplicaRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -7803,8 +8429,9 @@ func (v *StopReplicaRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -7825,8 +8452,9 @@ func (v *StopReplicaRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]StopReplicaRequestTopicPartitionState, l)
+					a = append(a, make([]StopReplicaRequestTopicPartitionState, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -7981,6 +8609,14 @@ func (v *StopReplicaResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *StopReplicaResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *StopReplicaResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *StopReplicaResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -8004,8 +8640,9 @@ func (v *StopReplicaResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]StopReplicaResponsePartition, l)
+			a = append(a, make([]StopReplicaResponsePartition, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -8013,10 +8650,18 @@ func (v *StopReplicaResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -8518,6 +9163,14 @@ func (v *UpdateMetadataRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *UpdateMetadataRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *UpdateMetadataRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -8549,8 +9202,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]UpdateMetadataRequestTopicPartition, l)
+			a = append(a, make([]UpdateMetadataRequestTopicPartition, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -8558,10 +9212,18 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 			s := v
 			if version >= 0 && version <= 4 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -8593,8 +9255,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -8619,8 +9282,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -8641,8 +9305,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -8670,8 +9335,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]UpdateMetadataRequestTopicState, l)
+			a = append(a, make([]UpdateMetadataRequestTopicState, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -8679,10 +9345,18 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -8702,8 +9376,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]UpdateMetadataRequestTopicPartition, l)
+					a = append(a, make([]UpdateMetadataRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -8711,10 +9386,18 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 					s := v
 					if version >= 0 && version <= 4 {
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -8746,8 +9429,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -8772,8 +9456,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -8794,8 +9479,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -8830,8 +9516,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]UpdateMetadataRequestLiveBroker, l)
+			a = append(a, make([]UpdateMetadataRequestLiveBroker, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -8843,10 +9530,18 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 			}
 			if version >= 0 && version <= 0 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Host = v
 			}
@@ -8866,8 +9561,9 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]UpdateMetadataRequestLiveBrokerEndpoint, l)
+					a = append(a, make([]UpdateMetadataRequestLiveBrokerEndpoint, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -8879,19 +9575,35 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Host = v
 					}
 					if version >= 3 {
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.ListenerName = v
 					}
@@ -8909,9 +9621,17 @@ func (v *UpdateMetadataRequest) ReadFrom(src []byte) error {
 			if version >= 2 {
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Rack = v
 			}
@@ -8988,6 +9708,14 @@ func (v *UpdateMetadataResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *UpdateMetadataResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *UpdateMetadataResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *UpdateMetadataResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -9090,6 +9818,14 @@ func (v *ControlledShutdownRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ControlledShutdownRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ControlledShutdownRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ControlledShutdownRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -9223,6 +9959,14 @@ func (v *ControlledShutdownResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ControlledShutdownResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ControlledShutdownResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ControlledShutdownResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -9246,8 +9990,9 @@ func (v *ControlledShutdownResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ControlledShutdownResponsePartitionsRemaining, l)
+			a = append(a, make([]ControlledShutdownResponsePartitionsRemaining, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -9255,10 +10000,18 @@ func (v *ControlledShutdownResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -9545,6 +10298,14 @@ func (v *OffsetCommitRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetCommitRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetCommitRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetCommitRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -9554,10 +10315,18 @@ func (v *OffsetCommitRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
@@ -9567,19 +10336,35 @@ func (v *OffsetCommitRequest) ReadFrom(src []byte) error {
 	}
 	if version >= 1 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.MemberID = v
 	}
 	if version >= 7 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.InstanceID = v
 	}
@@ -9599,8 +10384,9 @@ func (v *OffsetCommitRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetCommitRequestTopic, l)
+			a = append(a, make([]OffsetCommitRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -9608,10 +10394,18 @@ func (v *OffsetCommitRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -9627,8 +10421,9 @@ func (v *OffsetCommitRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetCommitRequestTopicPartition, l)
+					a = append(a, make([]OffsetCommitRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -9653,9 +10448,17 @@ func (v *OffsetCommitRequest) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Metadata = v
 					}
@@ -9877,6 +10680,14 @@ func (v *OffsetCommitResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetCommitResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetCommitResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetCommitResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -9900,8 +10711,9 @@ func (v *OffsetCommitResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetCommitResponseTopic, l)
+			a = append(a, make([]OffsetCommitResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -9909,10 +10721,18 @@ func (v *OffsetCommitResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -9928,8 +10748,9 @@ func (v *OffsetCommitResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetCommitResponseTopicPartition, l)
+					a = append(a, make([]OffsetCommitResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -10229,6 +11050,14 @@ func (v *OffsetFetchRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetFetchRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetFetchRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -10238,10 +11067,18 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 	s := v
 	if version >= 0 && version <= 7 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
@@ -10260,8 +11097,9 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetFetchRequestTopic, l)
+			a = append(a, make([]OffsetFetchRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -10269,10 +11107,18 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -10288,8 +11134,9 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -10317,8 +11164,9 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetFetchRequestGroup, l)
+			a = append(a, make([]OffsetFetchRequestGroup, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -10326,10 +11174,18 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Group = v
 			}
@@ -10348,8 +11204,9 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetFetchRequestGroupTopic, l)
+					a = append(a, make([]OffsetFetchRequestGroupTopic, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -10357,10 +11214,18 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -10376,8 +11241,9 @@ func (v *OffsetFetchRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -10807,6 +11673,14 @@ func (v *OffsetFetchResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetFetchResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetFetchResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -10830,8 +11704,9 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetFetchResponseTopic, l)
+			a = append(a, make([]OffsetFetchResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -10839,10 +11714,18 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -10858,8 +11741,9 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetFetchResponseTopicPartition, l)
+					a = append(a, make([]OffsetFetchResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -10880,9 +11764,17 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Metadata = v
 					}
@@ -10920,8 +11812,9 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetFetchResponseGroup, l)
+			a = append(a, make([]OffsetFetchResponseGroup, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -10929,10 +11822,18 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Group = v
 			}
@@ -10948,8 +11849,9 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetFetchResponseGroupTopic, l)
+					a = append(a, make([]OffsetFetchResponseGroupTopic, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -10957,10 +11859,18 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -10976,8 +11886,9 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]OffsetFetchResponseGroupTopicPartition, l)
+							a = append(a, make([]OffsetFetchResponseGroupTopicPartition, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -10998,9 +11909,17 @@ func (v *OffsetFetchResponse) ReadFrom(src []byte) error {
 							{
 								var v *string
 								if isFlexible {
-									v = b.CompactNullableString()
+									if unsafe {
+										v = b.UnsafeCompactNullableString()
+									} else {
+										v = b.CompactNullableString()
+									}
 								} else {
-									v = b.NullableString()
+									if unsafe {
+										v = b.UnsafeNullableString()
+									} else {
+										v = b.NullableString()
+									}
 								}
 								s.Metadata = v
 							}
@@ -11145,6 +12064,14 @@ func (v *FindCoordinatorRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *FindCoordinatorRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *FindCoordinatorRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *FindCoordinatorRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -11154,10 +12081,18 @@ func (v *FindCoordinatorRequest) ReadFrom(src []byte) error {
 	s := v
 	if version >= 0 && version <= 3 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.CoordinatorKey = v
 	}
@@ -11177,15 +12112,24 @@ func (v *FindCoordinatorRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -11407,6 +12351,14 @@ func (v *FindCoordinatorResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *FindCoordinatorResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *FindCoordinatorResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *FindCoordinatorResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -11425,9 +12377,17 @@ func (v *FindCoordinatorResponse) ReadFrom(src []byte) error {
 	if version >= 1 && version <= 3 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -11437,10 +12397,18 @@ func (v *FindCoordinatorResponse) ReadFrom(src []byte) error {
 	}
 	if version >= 0 && version <= 3 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Host = v
 	}
@@ -11460,8 +12428,9 @@ func (v *FindCoordinatorResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]FindCoordinatorResponseCoordinator, l)
+			a = append(a, make([]FindCoordinatorResponseCoordinator, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -11469,10 +12438,18 @@ func (v *FindCoordinatorResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Key = v
 			}
@@ -11482,10 +12459,18 @@ func (v *FindCoordinatorResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Host = v
 			}
@@ -11500,9 +12485,17 @@ func (v *FindCoordinatorResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -11758,6 +12751,14 @@ func (v *JoinGroupRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *JoinGroupRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *JoinGroupRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *JoinGroupRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -11767,10 +12768,18 @@ func (v *JoinGroupRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
@@ -11784,28 +12793,52 @@ func (v *JoinGroupRequest) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.MemberID = v
 	}
 	if version >= 5 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.InstanceID = v
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.ProtocolType = v
 	}
@@ -11821,8 +12854,9 @@ func (v *JoinGroupRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]JoinGroupRequestProtocol, l)
+			a = append(a, make([]JoinGroupRequestProtocol, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -11830,10 +12864,18 @@ func (v *JoinGroupRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Name = v
 			}
@@ -11856,9 +12898,17 @@ func (v *JoinGroupRequest) ReadFrom(src []byte) error {
 	if version >= 9 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.Reason = v
 	}
@@ -12128,6 +13178,14 @@ func (v *JoinGroupResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *JoinGroupResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *JoinGroupResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *JoinGroupResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -12150,9 +13208,17 @@ func (v *JoinGroupResponse) ReadFrom(src []byte) error {
 	if version >= 7 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ProtocolType = v
 	}
@@ -12161,26 +13227,50 @@ func (v *JoinGroupResponse) ReadFrom(src []byte) error {
 		if version < 7 {
 			var vv string
 			if isFlexible {
-				vv = b.CompactString()
+				if unsafe {
+					vv = b.UnsafeCompactString()
+				} else {
+					vv = b.CompactString()
+				}
 			} else {
-				vv = b.String()
+				if unsafe {
+					vv = b.UnsafeString()
+				} else {
+					vv = b.String()
+				}
 			}
 			v = &vv
 		} else {
 			if isFlexible {
-				v = b.CompactNullableString()
+				if unsafe {
+					v = b.UnsafeCompactNullableString()
+				} else {
+					v = b.CompactNullableString()
+				}
 			} else {
-				v = b.NullableString()
+				if unsafe {
+					v = b.UnsafeNullableString()
+				} else {
+					v = b.NullableString()
+				}
 			}
 		}
 		s.Protocol = v
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.LeaderID = v
 	}
@@ -12190,10 +13280,18 @@ func (v *JoinGroupResponse) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.MemberID = v
 	}
@@ -12209,8 +13307,9 @@ func (v *JoinGroupResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]JoinGroupResponseMember, l)
+			a = append(a, make([]JoinGroupResponseMember, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -12218,19 +13317,35 @@ func (v *JoinGroupResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.MemberID = v
 			}
 			if version >= 5 {
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.InstanceID = v
 			}
@@ -12359,6 +13474,14 @@ func (v *HeartbeatRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *HeartbeatRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *HeartbeatRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *HeartbeatRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -12368,10 +13491,18 @@ func (v *HeartbeatRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
@@ -12381,19 +13512,35 @@ func (v *HeartbeatRequest) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.MemberID = v
 	}
 	if version >= 3 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.InstanceID = v
 	}
@@ -12492,6 +13639,14 @@ func (v *HeartbeatResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *HeartbeatResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *HeartbeatResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *HeartbeatResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -12669,6 +13824,14 @@ func (v *LeaveGroupRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *LeaveGroupRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *LeaveGroupRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *LeaveGroupRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -12678,19 +13841,35 @@ func (v *LeaveGroupRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
 	if version >= 0 && version <= 2 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.MemberID = v
 	}
@@ -12706,8 +13885,9 @@ func (v *LeaveGroupRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaveGroupRequestMember, l)
+			a = append(a, make([]LeaveGroupRequestMember, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -12715,28 +13895,52 @@ func (v *LeaveGroupRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.MemberID = v
 			}
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.InstanceID = v
 			}
 			if version >= 5 {
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Reason = v
 			}
@@ -12904,6 +14108,14 @@ func (v *LeaveGroupResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *LeaveGroupResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *LeaveGroupResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *LeaveGroupResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -12931,8 +14143,9 @@ func (v *LeaveGroupResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]LeaveGroupResponseMember, l)
+			a = append(a, make([]LeaveGroupResponseMember, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -12940,19 +14153,35 @@ func (v *LeaveGroupResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.MemberID = v
 			}
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.InstanceID = v
 			}
@@ -13161,6 +14390,14 @@ func (v *SyncGroupRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *SyncGroupRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *SyncGroupRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *SyncGroupRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -13170,10 +14407,18 @@ func (v *SyncGroupRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
@@ -13183,37 +14428,69 @@ func (v *SyncGroupRequest) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.MemberID = v
 	}
 	if version >= 3 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.InstanceID = v
 	}
 	if version >= 5 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ProtocolType = v
 	}
 	if version >= 5 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.Protocol = v
 	}
@@ -13229,8 +14506,9 @@ func (v *SyncGroupRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]SyncGroupRequestGroupAssignment, l)
+			a = append(a, make([]SyncGroupRequestGroupAssignment, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -13238,10 +14516,18 @@ func (v *SyncGroupRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.MemberID = v
 			}
@@ -13392,6 +14678,14 @@ func (v *SyncGroupResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *SyncGroupResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *SyncGroupResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *SyncGroupResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -13410,18 +14704,34 @@ func (v *SyncGroupResponse) ReadFrom(src []byte) error {
 	if version >= 5 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ProtocolType = v
 	}
 	if version >= 5 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.Protocol = v
 	}
@@ -13531,6 +14841,14 @@ func (v *DescribeGroupsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeGroupsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeGroupsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeGroupsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -13550,15 +14868,24 @@ func (v *DescribeGroupsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -13861,6 +15188,14 @@ func (v *DescribeGroupsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeGroupsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeGroupsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeGroupsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -13884,8 +15219,9 @@ func (v *DescribeGroupsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeGroupsResponseGroup, l)
+			a = append(a, make([]DescribeGroupsResponseGroup, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -13897,37 +15233,69 @@ func (v *DescribeGroupsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Group = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.State = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ProtocolType = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Protocol = v
 			}
@@ -13943,8 +15311,9 @@ func (v *DescribeGroupsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeGroupsResponseGroupMember, l)
+					a = append(a, make([]DescribeGroupsResponseGroupMember, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -13952,37 +15321,69 @@ func (v *DescribeGroupsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.MemberID = v
 					}
 					if version >= 4 {
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.InstanceID = v
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.ClientID = v
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.ClientHost = v
 					}
@@ -14112,6 +15513,14 @@ func (v *ListGroupsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListGroupsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListGroupsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListGroupsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -14131,15 +15540,24 @@ func (v *ListGroupsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -14297,6 +15715,14 @@ func (v *ListGroupsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListGroupsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListGroupsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListGroupsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -14324,8 +15750,9 @@ func (v *ListGroupsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ListGroupsResponseGroup, l)
+			a = append(a, make([]ListGroupsResponseGroup, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -14333,28 +15760,52 @@ func (v *ListGroupsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Group = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ProtocolType = v
 			}
 			if version >= 4 {
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.GroupState = v
 			}
@@ -14438,13 +15889,26 @@ func (v *SASLHandshakeRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *SASLHandshakeRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *SASLHandshakeRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *SASLHandshakeRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
 	_ = version
 	s := v
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.Mechanism = v
 	}
 	return b.Complete()
@@ -14514,6 +15978,14 @@ func (v *SASLHandshakeResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *SASLHandshakeResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *SASLHandshakeResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *SASLHandshakeResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -14531,11 +16003,17 @@ func (v *SASLHandshakeResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
-			v := b.String()
+			var v string
+			if unsafe {
+				v = b.UnsafeString()
+			} else {
+				v = b.String()
+			}
 			a[i] = v
 		}
 		v = a
@@ -14647,6 +16125,14 @@ func (v *ApiVersionsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ApiVersionsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ApiVersionsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ApiVersionsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -14656,19 +16142,35 @@ func (v *ApiVersionsRequest) ReadFrom(src []byte) error {
 	s := v
 	if version >= 3 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.ClientSoftwareName = v
 	}
 	if version >= 3 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.ClientSoftwareVersion = v
 	}
@@ -14985,6 +16487,14 @@ func (v *ApiVersionsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ApiVersionsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ApiVersionsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ApiVersionsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -15008,8 +16518,9 @@ func (v *ApiVersionsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ApiVersionsResponseApiKey, l)
+			a = append(a, make([]ApiVersionsResponseApiKey, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -15056,8 +16567,9 @@ func (v *ApiVersionsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ApiVersionsResponseSupportedFeature, l)
+					a = append(a, make([]ApiVersionsResponseSupportedFeature, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -15065,10 +16577,18 @@ func (v *ApiVersionsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Name = v
 					}
@@ -15109,8 +16629,9 @@ func (v *ApiVersionsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ApiVersionsResponseFinalizedFeature, l)
+					a = append(a, make([]ApiVersionsResponseFinalizedFeature, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -15118,10 +16639,18 @@ func (v *ApiVersionsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Name = v
 					}
@@ -15425,6 +16954,14 @@ func (v *CreateTopicsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreateTopicsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreateTopicsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreateTopicsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -15444,8 +16981,9 @@ func (v *CreateTopicsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]CreateTopicsRequestTopic, l)
+			a = append(a, make([]CreateTopicsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -15453,10 +16991,18 @@ func (v *CreateTopicsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -15480,8 +17026,9 @@ func (v *CreateTopicsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]CreateTopicsRequestTopicReplicaAssignment, l)
+					a = append(a, make([]CreateTopicsRequestTopicReplicaAssignment, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -15503,8 +17050,9 @@ func (v *CreateTopicsRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -15532,8 +17080,9 @@ func (v *CreateTopicsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]CreateTopicsRequestTopicConfig, l)
+					a = append(a, make([]CreateTopicsRequestTopicConfig, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -15541,19 +17090,35 @@ func (v *CreateTopicsRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Name = v
 					}
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Value = v
 					}
@@ -15880,6 +17445,14 @@ func (v *CreateTopicsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreateTopicsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreateTopicsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreateTopicsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -15903,8 +17476,9 @@ func (v *CreateTopicsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]CreateTopicsResponseTopic, l)
+			a = append(a, make([]CreateTopicsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -15912,10 +17486,18 @@ func (v *CreateTopicsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -15930,9 +17512,17 @@ func (v *CreateTopicsResponse) ReadFrom(src []byte) error {
 			if version >= 1 {
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -15959,8 +17549,9 @@ func (v *CreateTopicsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]CreateTopicsResponseTopicConfig, l)
+					a = append(a, make([]CreateTopicsResponseTopicConfig, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -15968,19 +17559,35 @@ func (v *CreateTopicsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Name = v
 					}
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Value = v
 					}
@@ -16176,6 +17783,14 @@ func (v *DeleteTopicsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteTopicsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteTopicsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteTopicsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -16195,15 +17810,24 @@ func (v *DeleteTopicsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -16222,8 +17846,9 @@ func (v *DeleteTopicsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DeleteTopicsRequestTopic, l)
+			a = append(a, make([]DeleteTopicsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -16232,9 +17857,17 @@ func (v *DeleteTopicsRequest) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Topic = v
 			}
@@ -16435,6 +18068,14 @@ func (v *DeleteTopicsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteTopicsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteTopicsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteTopicsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -16458,8 +18099,9 @@ func (v *DeleteTopicsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DeleteTopicsResponseTopic, l)
+			a = append(a, make([]DeleteTopicsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -16470,16 +18112,32 @@ func (v *DeleteTopicsResponse) ReadFrom(src []byte) error {
 				if version < 6 {
 					var vv string
 					if isFlexible {
-						vv = b.CompactString()
+						if unsafe {
+							vv = b.UnsafeCompactString()
+						} else {
+							vv = b.CompactString()
+						}
 					} else {
-						vv = b.String()
+						if unsafe {
+							vv = b.UnsafeString()
+						} else {
+							vv = b.String()
+						}
 					}
 					v = &vv
 				} else {
 					if isFlexible {
-						v = b.CompactNullableString()
+						if unsafe {
+							v = b.UnsafeCompactNullableString()
+						} else {
+							v = b.CompactNullableString()
+						}
 					} else {
-						v = b.NullableString()
+						if unsafe {
+							v = b.UnsafeNullableString()
+						} else {
+							v = b.NullableString()
+						}
 					}
 				}
 				s.Topic = v
@@ -16495,9 +18153,17 @@ func (v *DeleteTopicsResponse) ReadFrom(src []byte) error {
 			if version >= 5 {
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -16702,6 +18368,14 @@ func (v *DeleteRecordsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteRecordsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteRecordsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteRecordsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -16721,8 +18395,9 @@ func (v *DeleteRecordsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DeleteRecordsRequestTopic, l)
+			a = append(a, make([]DeleteRecordsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -16730,10 +18405,18 @@ func (v *DeleteRecordsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -16749,8 +18432,9 @@ func (v *DeleteRecordsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DeleteRecordsRequestTopicPartition, l)
+					a = append(a, make([]DeleteRecordsRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -16981,6 +18665,14 @@ func (v *DeleteRecordsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteRecordsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteRecordsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteRecordsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -17004,8 +18696,9 @@ func (v *DeleteRecordsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DeleteRecordsResponseTopic, l)
+			a = append(a, make([]DeleteRecordsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -17013,10 +18706,18 @@ func (v *DeleteRecordsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -17032,8 +18733,9 @@ func (v *DeleteRecordsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DeleteRecordsResponseTopicPartition, l)
+					a = append(a, make([]DeleteRecordsResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -17182,6 +18884,14 @@ func (v *InitProducerIDRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *InitProducerIDRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *InitProducerIDRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *InitProducerIDRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -17192,9 +18902,17 @@ func (v *InitProducerIDRequest) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.TransactionalID = v
 	}
@@ -17327,6 +19045,14 @@ func (v *InitProducerIDResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *InitProducerIDResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *InitProducerIDResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *InitProducerIDResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -17547,6 +19273,14 @@ func (v *OffsetForLeaderEpochRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetForLeaderEpochRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetForLeaderEpochRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetForLeaderEpochRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -17570,8 +19304,9 @@ func (v *OffsetForLeaderEpochRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetForLeaderEpochRequestTopic, l)
+			a = append(a, make([]OffsetForLeaderEpochRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -17579,10 +19314,18 @@ func (v *OffsetForLeaderEpochRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -17598,8 +19341,9 @@ func (v *OffsetForLeaderEpochRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetForLeaderEpochRequestTopicPartition, l)
+					a = append(a, make([]OffsetForLeaderEpochRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -17858,6 +19602,14 @@ func (v *OffsetForLeaderEpochResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetForLeaderEpochResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetForLeaderEpochResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetForLeaderEpochResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -17881,8 +19633,9 @@ func (v *OffsetForLeaderEpochResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetForLeaderEpochResponseTopic, l)
+			a = append(a, make([]OffsetForLeaderEpochResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -17890,10 +19643,18 @@ func (v *OffsetForLeaderEpochResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -17909,8 +19670,9 @@ func (v *OffsetForLeaderEpochResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetForLeaderEpochResponseTopicPartition, l)
+					a = append(a, make([]OffsetForLeaderEpochResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -18109,6 +19871,14 @@ func (v *AddPartitionsToTxnRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AddPartitionsToTxnRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AddPartitionsToTxnRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AddPartitionsToTxnRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -18118,10 +19888,18 @@ func (v *AddPartitionsToTxnRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.TransactionalID = v
 	}
@@ -18145,8 +19923,9 @@ func (v *AddPartitionsToTxnRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AddPartitionsToTxnRequestTopic, l)
+			a = append(a, make([]AddPartitionsToTxnRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -18154,10 +19933,18 @@ func (v *AddPartitionsToTxnRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -18173,8 +19960,9 @@ func (v *AddPartitionsToTxnRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -18395,6 +20183,14 @@ func (v *AddPartitionsToTxnResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AddPartitionsToTxnResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AddPartitionsToTxnResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AddPartitionsToTxnResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -18418,8 +20214,9 @@ func (v *AddPartitionsToTxnResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AddPartitionsToTxnResponseTopic, l)
+			a = append(a, make([]AddPartitionsToTxnResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -18427,10 +20224,18 @@ func (v *AddPartitionsToTxnResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -18446,8 +20251,9 @@ func (v *AddPartitionsToTxnResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AddPartitionsToTxnResponseTopicPartition, l)
+					a = append(a, make([]AddPartitionsToTxnResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -18589,6 +20395,14 @@ func (v *AddOffsetsToTxnRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AddOffsetsToTxnRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AddOffsetsToTxnRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AddOffsetsToTxnRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -18598,10 +20412,18 @@ func (v *AddOffsetsToTxnRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.TransactionalID = v
 	}
@@ -18615,10 +20437,18 @@ func (v *AddOffsetsToTxnRequest) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
@@ -18710,6 +20540,14 @@ func (v *AddOffsetsToTxnResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AddOffsetsToTxnResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AddOffsetsToTxnResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AddOffsetsToTxnResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -18827,6 +20665,14 @@ func (v *EndTxnRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *EndTxnRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *EndTxnRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *EndTxnRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -18836,10 +20682,18 @@ func (v *EndTxnRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.TransactionalID = v
 	}
@@ -18951,6 +20805,14 @@ func (v *EndTxnResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *EndTxnResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *EndTxnResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *EndTxnResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -19156,6 +21018,14 @@ func (v *WriteTxnMarkersRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *WriteTxnMarkersRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *WriteTxnMarkersRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *WriteTxnMarkersRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -19175,8 +21045,9 @@ func (v *WriteTxnMarkersRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]WriteTxnMarkersRequestMarker, l)
+			a = append(a, make([]WriteTxnMarkersRequestMarker, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -19206,8 +21077,9 @@ func (v *WriteTxnMarkersRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]WriteTxnMarkersRequestMarkerTopic, l)
+					a = append(a, make([]WriteTxnMarkersRequestMarkerTopic, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -19215,10 +21087,18 @@ func (v *WriteTxnMarkersRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -19234,8 +21114,9 @@ func (v *WriteTxnMarkersRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -19457,6 +21338,14 @@ func (v *WriteTxnMarkersResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *WriteTxnMarkersResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *WriteTxnMarkersResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *WriteTxnMarkersResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -19476,8 +21365,9 @@ func (v *WriteTxnMarkersResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]WriteTxnMarkersResponseMarker, l)
+			a = append(a, make([]WriteTxnMarkersResponseMarker, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -19499,8 +21389,9 @@ func (v *WriteTxnMarkersResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]WriteTxnMarkersResponseMarkerTopic, l)
+					a = append(a, make([]WriteTxnMarkersResponseMarkerTopic, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -19508,10 +21399,18 @@ func (v *WriteTxnMarkersResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -19527,8 +21426,9 @@ func (v *WriteTxnMarkersResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]WriteTxnMarkersResponseMarkerTopicPartition, l)
+							a = append(a, make([]WriteTxnMarkersResponseMarkerTopicPartition, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -19831,6 +21731,14 @@ func (v *TxnOffsetCommitRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *TxnOffsetCommitRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *TxnOffsetCommitRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *TxnOffsetCommitRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -19840,19 +21748,35 @@ func (v *TxnOffsetCommitRequest) ReadFrom(src []byte) error {
 	s := v
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.TransactionalID = v
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.Group = v
 	}
@@ -19870,19 +21794,35 @@ func (v *TxnOffsetCommitRequest) ReadFrom(src []byte) error {
 	}
 	if version >= 3 {
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.MemberID = v
 	}
 	if version >= 3 {
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.InstanceID = v
 	}
@@ -19898,8 +21838,9 @@ func (v *TxnOffsetCommitRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]TxnOffsetCommitRequestTopic, l)
+			a = append(a, make([]TxnOffsetCommitRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -19907,10 +21848,18 @@ func (v *TxnOffsetCommitRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -19926,8 +21875,9 @@ func (v *TxnOffsetCommitRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]TxnOffsetCommitRequestTopicPartition, l)
+					a = append(a, make([]TxnOffsetCommitRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -19948,9 +21898,17 @@ func (v *TxnOffsetCommitRequest) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Metadata = v
 					}
@@ -20178,6 +22136,14 @@ func (v *TxnOffsetCommitResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *TxnOffsetCommitResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *TxnOffsetCommitResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *TxnOffsetCommitResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -20201,8 +22167,9 @@ func (v *TxnOffsetCommitResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]TxnOffsetCommitResponseTopic, l)
+			a = append(a, make([]TxnOffsetCommitResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -20210,10 +22177,18 @@ func (v *TxnOffsetCommitResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -20229,8 +22204,9 @@ func (v *TxnOffsetCommitResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]TxnOffsetCommitResponseTopicPartition, l)
+					a = append(a, make([]TxnOffsetCommitResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -20412,6 +22388,14 @@ func (v *DescribeACLsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeACLsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeACLsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeACLsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -20431,9 +22415,17 @@ func (v *DescribeACLsRequest) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ResourceName = v
 	}
@@ -20449,18 +22441,34 @@ func (v *DescribeACLsRequest) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.Principal = v
 	}
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.Host = v
 	}
@@ -20726,6 +22734,14 @@ func (v *DescribeACLsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeACLsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeACLsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeACLsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -20744,9 +22760,17 @@ func (v *DescribeACLsResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -20762,8 +22786,9 @@ func (v *DescribeACLsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeACLsResponseResource, l)
+			a = append(a, make([]DescribeACLsResponseResource, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -20780,10 +22805,18 @@ func (v *DescribeACLsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -20808,8 +22841,9 @@ func (v *DescribeACLsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeACLsResponseResourceACL, l)
+					a = append(a, make([]DescribeACLsResponseResourceACL, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -20817,19 +22851,35 @@ func (v *DescribeACLsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Principal = v
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Host = v
 					}
@@ -21056,6 +23106,14 @@ func (v *CreateACLsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreateACLsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreateACLsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreateACLsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -21075,8 +23133,9 @@ func (v *CreateACLsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]CreateACLsRequestCreation, l)
+			a = append(a, make([]CreateACLsRequestCreation, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -21093,10 +23152,18 @@ func (v *CreateACLsRequest) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -21111,19 +23178,35 @@ func (v *CreateACLsRequest) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Principal = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Host = v
 			}
@@ -21277,6 +23360,14 @@ func (v *CreateACLsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreateACLsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreateACLsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreateACLsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -21300,8 +23391,9 @@ func (v *CreateACLsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]CreateACLsResponseResult, l)
+			a = append(a, make([]CreateACLsResponseResult, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -21314,9 +23406,17 @@ func (v *CreateACLsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -21500,6 +23600,14 @@ func (v *DeleteACLsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteACLsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteACLsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteACLsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -21519,8 +23627,9 @@ func (v *DeleteACLsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DeleteACLsRequestFilter, l)
+			a = append(a, make([]DeleteACLsRequestFilter, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -21538,9 +23647,17 @@ func (v *DeleteACLsRequest) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -21556,18 +23673,34 @@ func (v *DeleteACLsRequest) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Principal = v
 			}
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Host = v
 			}
@@ -21844,6 +23977,14 @@ func (v *DeleteACLsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteACLsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteACLsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteACLsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -21867,8 +24008,9 @@ func (v *DeleteACLsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DeleteACLsResponseResult, l)
+			a = append(a, make([]DeleteACLsResponseResult, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -21881,9 +24023,17 @@ func (v *DeleteACLsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -21899,8 +24049,9 @@ func (v *DeleteACLsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DeleteACLsResponseResultMatchingACL, l)
+					a = append(a, make([]DeleteACLsResponseResultMatchingACL, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -21913,9 +24064,17 @@ func (v *DeleteACLsResponse) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.ErrorMessage = v
 					}
@@ -21930,10 +24089,18 @@ func (v *DeleteACLsResponse) ReadFrom(src []byte) error {
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.ResourceName = v
 					}
@@ -21948,19 +24115,35 @@ func (v *DeleteACLsResponse) ReadFrom(src []byte) error {
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Principal = v
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Host = v
 					}
@@ -22166,6 +24349,14 @@ func (v *DescribeConfigsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeConfigsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeConfigsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeConfigsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -22185,8 +24376,9 @@ func (v *DescribeConfigsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeConfigsRequestResource, l)
+			a = append(a, make([]DescribeConfigsRequestResource, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -22203,10 +24395,18 @@ func (v *DescribeConfigsRequest) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -22225,15 +24425,24 @@ func (v *DescribeConfigsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]string, l)
+					a = append(a, make([]string, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					var v string
-					if isFlexible {
-						v = b.CompactString()
+					if unsafe {
+						if isFlexible {
+							v = b.UnsafeCompactString()
+						} else {
+							v = b.UnsafeString()
+						}
 					} else {
-						v = b.String()
+						if isFlexible {
+							v = b.CompactString()
+						} else {
+							v = b.String()
+						}
 					}
 					a[i] = v
 				}
@@ -22607,6 +24816,14 @@ func (v *DescribeConfigsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeConfigsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeConfigsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -22630,8 +24847,9 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeConfigsResponseResource, l)
+			a = append(a, make([]DescribeConfigsResponseResource, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -22644,9 +24862,17 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -22661,10 +24887,18 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -22680,8 +24914,9 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeConfigsResponseResourceConfig, l)
+					a = append(a, make([]DescribeConfigsResponseResourceConfig, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -22689,19 +24924,35 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Name = v
 					}
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Value = v
 					}
@@ -22738,8 +24989,9 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]DescribeConfigsResponseResourceConfigConfigSynonym, l)
+							a = append(a, make([]DescribeConfigsResponseResourceConfigConfigSynonym, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -22747,19 +24999,35 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 							s := v
 							{
 								var v string
-								if isFlexible {
-									v = b.CompactString()
+								if unsafe {
+									if isFlexible {
+										v = b.UnsafeCompactString()
+									} else {
+										v = b.UnsafeString()
+									}
 								} else {
-									v = b.String()
+									if isFlexible {
+										v = b.CompactString()
+									} else {
+										v = b.String()
+									}
 								}
 								s.Name = v
 							}
 							{
 								var v *string
 								if isFlexible {
-									v = b.CompactNullableString()
+									if unsafe {
+										v = b.UnsafeCompactNullableString()
+									} else {
+										v = b.CompactNullableString()
+									}
 								} else {
-									v = b.NullableString()
+									if unsafe {
+										v = b.UnsafeNullableString()
+									} else {
+										v = b.NullableString()
+									}
 								}
 								s.Value = v
 							}
@@ -22791,9 +25059,17 @@ func (v *DescribeConfigsResponse) ReadFrom(src []byte) error {
 					if version >= 3 {
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Documentation = v
 					}
@@ -23027,6 +25303,14 @@ func (v *AlterConfigsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterConfigsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterConfigsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterConfigsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -23046,8 +25330,9 @@ func (v *AlterConfigsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterConfigsRequestResource, l)
+			a = append(a, make([]AlterConfigsRequestResource, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -23064,10 +25349,18 @@ func (v *AlterConfigsRequest) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -23083,8 +25376,9 @@ func (v *AlterConfigsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterConfigsRequestResourceConfig, l)
+					a = append(a, make([]AlterConfigsRequestResourceConfig, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -23092,19 +25386,35 @@ func (v *AlterConfigsRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Name = v
 					}
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Value = v
 					}
@@ -23286,6 +25596,14 @@ func (v *AlterConfigsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterConfigsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterConfigsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterConfigsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -23309,8 +25627,9 @@ func (v *AlterConfigsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterConfigsResponseResource, l)
+			a = append(a, make([]AlterConfigsResponseResource, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -23323,9 +25642,17 @@ func (v *AlterConfigsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -23340,10 +25667,18 @@ func (v *AlterConfigsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -23537,6 +25872,14 @@ func (v *AlterReplicaLogDirsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterReplicaLogDirsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterReplicaLogDirsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterReplicaLogDirsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -23556,8 +25899,9 @@ func (v *AlterReplicaLogDirsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterReplicaLogDirsRequestDir, l)
+			a = append(a, make([]AlterReplicaLogDirsRequestDir, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -23565,10 +25909,18 @@ func (v *AlterReplicaLogDirsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Dir = v
 			}
@@ -23584,8 +25936,9 @@ func (v *AlterReplicaLogDirsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterReplicaLogDirsRequestDirTopic, l)
+					a = append(a, make([]AlterReplicaLogDirsRequestDirTopic, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -23593,10 +25946,18 @@ func (v *AlterReplicaLogDirsRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -23612,8 +25973,9 @@ func (v *AlterReplicaLogDirsRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -23822,6 +26184,14 @@ func (v *AlterReplicaLogDirsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterReplicaLogDirsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterReplicaLogDirsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterReplicaLogDirsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -23845,8 +26215,9 @@ func (v *AlterReplicaLogDirsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterReplicaLogDirsResponseTopic, l)
+			a = append(a, make([]AlterReplicaLogDirsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -23854,10 +26225,18 @@ func (v *AlterReplicaLogDirsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -23873,8 +26252,9 @@ func (v *AlterReplicaLogDirsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterReplicaLogDirsResponseTopicPartition, l)
+					a = append(a, make([]AlterReplicaLogDirsResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -24035,6 +26415,14 @@ func (v *DescribeLogDirsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeLogDirsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeLogDirsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeLogDirsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -24057,8 +26445,9 @@ func (v *DescribeLogDirsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeLogDirsRequestTopic, l)
+			a = append(a, make([]DescribeLogDirsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -24066,10 +26455,18 @@ func (v *DescribeLogDirsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -24085,8 +26482,9 @@ func (v *DescribeLogDirsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -24364,6 +26762,14 @@ func (v *DescribeLogDirsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeLogDirsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeLogDirsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeLogDirsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -24391,8 +26797,9 @@ func (v *DescribeLogDirsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeLogDirsResponseDir, l)
+			a = append(a, make([]DescribeLogDirsResponseDir, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -24404,10 +26811,18 @@ func (v *DescribeLogDirsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Dir = v
 			}
@@ -24423,8 +26838,9 @@ func (v *DescribeLogDirsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeLogDirsResponseDirTopic, l)
+					a = append(a, make([]DescribeLogDirsResponseDirTopic, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -24432,10 +26848,18 @@ func (v *DescribeLogDirsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -24451,8 +26875,9 @@ func (v *DescribeLogDirsResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]DescribeLogDirsResponseDirTopicPartition, l)
+							a = append(a, make([]DescribeLogDirsResponseDirTopicPartition, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -24579,6 +27004,14 @@ func (v *SASLAuthenticateRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *SASLAuthenticateRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *SASLAuthenticateRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *SASLAuthenticateRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -24693,6 +27126,14 @@ func (v *SASLAuthenticateResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *SASLAuthenticateResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *SASLAuthenticateResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *SASLAuthenticateResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -24707,9 +27148,17 @@ func (v *SASLAuthenticateResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -24934,6 +27383,14 @@ func (v *CreatePartitionsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreatePartitionsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreatePartitionsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreatePartitionsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -24953,8 +27410,9 @@ func (v *CreatePartitionsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]CreatePartitionsRequestTopic, l)
+			a = append(a, make([]CreatePartitionsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -24962,10 +27420,18 @@ func (v *CreatePartitionsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -24988,8 +27454,9 @@ func (v *CreatePartitionsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]CreatePartitionsRequestTopicAssignment, l)
+					a = append(a, make([]CreatePartitionsRequestTopicAssignment, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -25007,8 +27474,9 @@ func (v *CreatePartitionsRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -25200,6 +27668,14 @@ func (v *CreatePartitionsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreatePartitionsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreatePartitionsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreatePartitionsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -25223,8 +27699,9 @@ func (v *CreatePartitionsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]CreatePartitionsResponseTopic, l)
+			a = append(a, make([]CreatePartitionsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -25232,10 +27709,18 @@ func (v *CreatePartitionsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -25246,9 +27731,17 @@ func (v *CreatePartitionsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -25407,6 +27900,14 @@ func (v *CreateDelegationTokenRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreateDelegationTokenRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreateDelegationTokenRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreateDelegationTokenRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -25426,8 +27927,9 @@ func (v *CreateDelegationTokenRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]CreateDelegationTokenRequestRenewer, l)
+			a = append(a, make([]CreateDelegationTokenRequestRenewer, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -25435,19 +27937,35 @@ func (v *CreateDelegationTokenRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.PrincipalType = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.PrincipalName = v
 			}
@@ -25617,6 +28135,14 @@ func (v *CreateDelegationTokenResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *CreateDelegationTokenResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *CreateDelegationTokenResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *CreateDelegationTokenResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -25630,19 +28156,35 @@ func (v *CreateDelegationTokenResponse) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.PrincipalType = v
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.PrincipalName = v
 	}
@@ -25660,10 +28202,18 @@ func (v *CreateDelegationTokenResponse) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.TokenID = v
 	}
@@ -25769,6 +28319,14 @@ func (v *RenewDelegationTokenRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *RenewDelegationTokenRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *RenewDelegationTokenRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *RenewDelegationTokenRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -25880,6 +28438,14 @@ func (v *RenewDelegationTokenResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *RenewDelegationTokenResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *RenewDelegationTokenResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *RenewDelegationTokenResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -25994,6 +28560,14 @@ func (v *ExpireDelegationTokenRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ExpireDelegationTokenRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ExpireDelegationTokenRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ExpireDelegationTokenRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -26104,6 +28678,14 @@ func (v *ExpireDelegationTokenResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ExpireDelegationTokenResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ExpireDelegationTokenResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ExpireDelegationTokenResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -26254,6 +28836,14 @@ func (v *DescribeDelegationTokenRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeDelegationTokenRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeDelegationTokenRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeDelegationTokenRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -26276,8 +28866,9 @@ func (v *DescribeDelegationTokenRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeDelegationTokenRequestOwner, l)
+			a = append(a, make([]DescribeDelegationTokenRequestOwner, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -26285,19 +28876,35 @@ func (v *DescribeDelegationTokenRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.PrincipalType = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.PrincipalName = v
 			}
@@ -26551,6 +29158,14 @@ func (v *DescribeDelegationTokenResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeDelegationTokenResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeDelegationTokenResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeDelegationTokenResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -26574,8 +29189,9 @@ func (v *DescribeDelegationTokenResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeDelegationTokenResponseTokenDetail, l)
+			a = append(a, make([]DescribeDelegationTokenResponseTokenDetail, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -26583,19 +29199,35 @@ func (v *DescribeDelegationTokenResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.PrincipalType = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.PrincipalName = v
 			}
@@ -26613,10 +29245,18 @@ func (v *DescribeDelegationTokenResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.TokenID = v
 			}
@@ -26641,8 +29281,9 @@ func (v *DescribeDelegationTokenResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeDelegationTokenResponseTokenDetailRenewer, l)
+					a = append(a, make([]DescribeDelegationTokenResponseTokenDetailRenewer, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -26650,19 +29291,35 @@ func (v *DescribeDelegationTokenResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.PrincipalType = v
 					}
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.PrincipalName = v
 					}
@@ -26774,6 +29431,14 @@ func (v *DeleteGroupsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteGroupsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteGroupsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteGroupsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -26793,15 +29458,24 @@ func (v *DeleteGroupsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -26946,6 +29620,14 @@ func (v *DeleteGroupsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DeleteGroupsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DeleteGroupsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DeleteGroupsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -26969,8 +29651,9 @@ func (v *DeleteGroupsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DeleteGroupsResponseGroup, l)
+			a = append(a, make([]DeleteGroupsResponseGroup, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -26978,10 +29661,18 @@ func (v *DeleteGroupsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Group = v
 			}
@@ -27156,6 +29847,14 @@ func (v *ElectLeadersRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ElectLeadersRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ElectLeadersRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ElectLeadersRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -27182,8 +29881,9 @@ func (v *ElectLeadersRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ElectLeadersRequestTopic, l)
+			a = append(a, make([]ElectLeadersRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -27191,10 +29891,18 @@ func (v *ElectLeadersRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -27210,8 +29918,9 @@ func (v *ElectLeadersRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -27434,6 +30143,14 @@ func (v *ElectLeadersResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ElectLeadersResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ElectLeadersResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ElectLeadersResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -27461,8 +30178,9 @@ func (v *ElectLeadersResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ElectLeadersResponseTopic, l)
+			a = append(a, make([]ElectLeadersResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -27470,10 +30188,18 @@ func (v *ElectLeadersResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -27489,8 +30215,9 @@ func (v *ElectLeadersResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ElectLeadersResponseTopicPartition, l)
+					a = append(a, make([]ElectLeadersResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -27507,9 +30234,17 @@ func (v *ElectLeadersResponse) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.ErrorMessage = v
 					}
@@ -27758,6 +30493,14 @@ func (v *IncrementalAlterConfigsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *IncrementalAlterConfigsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *IncrementalAlterConfigsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *IncrementalAlterConfigsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -27777,8 +30520,9 @@ func (v *IncrementalAlterConfigsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]IncrementalAlterConfigsRequestResource, l)
+			a = append(a, make([]IncrementalAlterConfigsRequestResource, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -27795,10 +30539,18 @@ func (v *IncrementalAlterConfigsRequest) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -27814,8 +30566,9 @@ func (v *IncrementalAlterConfigsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]IncrementalAlterConfigsRequestResourceConfig, l)
+					a = append(a, make([]IncrementalAlterConfigsRequestResourceConfig, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -27823,10 +30576,18 @@ func (v *IncrementalAlterConfigsRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Name = v
 					}
@@ -27842,9 +30603,17 @@ func (v *IncrementalAlterConfigsRequest) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Value = v
 					}
@@ -28028,6 +30797,14 @@ func (v *IncrementalAlterConfigsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *IncrementalAlterConfigsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *IncrementalAlterConfigsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *IncrementalAlterConfigsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -28051,8 +30828,9 @@ func (v *IncrementalAlterConfigsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]IncrementalAlterConfigsResponseResource, l)
+			a = append(a, make([]IncrementalAlterConfigsResponseResource, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -28065,9 +30843,17 @@ func (v *IncrementalAlterConfigsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -28082,10 +30868,18 @@ func (v *IncrementalAlterConfigsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.ResourceName = v
 			}
@@ -28286,6 +31080,14 @@ func (v *AlterPartitionAssignmentsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterPartitionAssignmentsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterPartitionAssignmentsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterPartitionAssignmentsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -28309,8 +31111,9 @@ func (v *AlterPartitionAssignmentsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterPartitionAssignmentsRequestTopic, l)
+			a = append(a, make([]AlterPartitionAssignmentsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -28318,10 +31121,18 @@ func (v *AlterPartitionAssignmentsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -28337,8 +31148,9 @@ func (v *AlterPartitionAssignmentsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterPartitionAssignmentsRequestTopicPartition, l)
+					a = append(a, make([]AlterPartitionAssignmentsRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -28363,8 +31175,9 @@ func (v *AlterPartitionAssignmentsRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -28598,6 +31411,14 @@ func (v *AlterPartitionAssignmentsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterPartitionAssignmentsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterPartitionAssignmentsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterPartitionAssignmentsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -28616,9 +31437,17 @@ func (v *AlterPartitionAssignmentsResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -28634,8 +31463,9 @@ func (v *AlterPartitionAssignmentsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterPartitionAssignmentsResponseTopic, l)
+			a = append(a, make([]AlterPartitionAssignmentsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -28643,10 +31473,18 @@ func (v *AlterPartitionAssignmentsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -28662,8 +31500,9 @@ func (v *AlterPartitionAssignmentsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterPartitionAssignmentsResponseTopicPartition, l)
+					a = append(a, make([]AlterPartitionAssignmentsResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -28680,9 +31519,17 @@ func (v *AlterPartitionAssignmentsResponse) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.ErrorMessage = v
 					}
@@ -28847,6 +31694,14 @@ func (v *ListPartitionReassignmentsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListPartitionReassignmentsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListPartitionReassignmentsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListPartitionReassignmentsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -28873,8 +31728,9 @@ func (v *ListPartitionReassignmentsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ListPartitionReassignmentsRequestTopic, l)
+			a = append(a, make([]ListPartitionReassignmentsRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -28882,10 +31738,18 @@ func (v *ListPartitionReassignmentsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -28901,8 +31765,9 @@ func (v *ListPartitionReassignmentsRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -29150,6 +32015,14 @@ func (v *ListPartitionReassignmentsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListPartitionReassignmentsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListPartitionReassignmentsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -29168,9 +32041,17 @@ func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -29186,8 +32067,9 @@ func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ListPartitionReassignmentsResponseTopic, l)
+			a = append(a, make([]ListPartitionReassignmentsResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -29195,10 +32077,18 @@ func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -29214,8 +32104,9 @@ func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]ListPartitionReassignmentsResponseTopicPartition, l)
+					a = append(a, make([]ListPartitionReassignmentsResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -29237,8 +32128,9 @@ func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -29259,8 +32151,9 @@ func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -29281,8 +32174,9 @@ func (v *ListPartitionReassignmentsResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -29439,13 +32333,26 @@ func (v *OffsetDeleteRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetDeleteRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetDeleteRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetDeleteRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
 	_ = version
 	s := v
 	{
-		v := b.String()
+		var v string
+		if unsafe {
+			v = b.UnsafeString()
+		} else {
+			v = b.String()
+		}
 		s.Group = v
 	}
 	{
@@ -29456,15 +32363,21 @@ func (v *OffsetDeleteRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetDeleteRequestTopic, l)
+			a = append(a, make([]OffsetDeleteRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -29475,8 +32388,9 @@ func (v *OffsetDeleteRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetDeleteRequestTopicPartition, l)
+					a = append(a, make([]OffsetDeleteRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -29647,6 +32561,14 @@ func (v *OffsetDeleteResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *OffsetDeleteResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *OffsetDeleteResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *OffsetDeleteResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -29668,15 +32590,21 @@ func (v *OffsetDeleteResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]OffsetDeleteResponseTopic, l)
+			a = append(a, make([]OffsetDeleteResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -29687,8 +32615,9 @@ func (v *OffsetDeleteResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]OffsetDeleteResponseTopicPartition, l)
+					a = append(a, make([]OffsetDeleteResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -29858,6 +32787,14 @@ func (v *DescribeClientQuotasRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeClientQuotasRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeClientQuotasRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeClientQuotasRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -29877,8 +32814,9 @@ func (v *DescribeClientQuotasRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeClientQuotasRequestComponent, l)
+			a = append(a, make([]DescribeClientQuotasRequestComponent, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -29886,10 +32824,18 @@ func (v *DescribeClientQuotasRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.EntityType = v
 			}
@@ -29905,9 +32851,17 @@ func (v *DescribeClientQuotasRequest) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Match = v
 			}
@@ -30162,6 +33116,14 @@ func (v *DescribeClientQuotasResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeClientQuotasResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeClientQuotasResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeClientQuotasResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -30180,9 +33142,17 @@ func (v *DescribeClientQuotasResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -30201,8 +33171,9 @@ func (v *DescribeClientQuotasResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeClientQuotasResponseEntry, l)
+			a = append(a, make([]DescribeClientQuotasResponseEntry, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -30220,8 +33191,9 @@ func (v *DescribeClientQuotasResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeClientQuotasResponseEntryEntity, l)
+					a = append(a, make([]DescribeClientQuotasResponseEntryEntity, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -30229,19 +33201,35 @@ func (v *DescribeClientQuotasResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Type = v
 					}
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Name = v
 					}
@@ -30264,8 +33252,9 @@ func (v *DescribeClientQuotasResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeClientQuotasResponseEntryValue, l)
+					a = append(a, make([]DescribeClientQuotasResponseEntryValue, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -30273,10 +33262,18 @@ func (v *DescribeClientQuotasResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Key = v
 					}
@@ -30533,6 +33530,14 @@ func (v *AlterClientQuotasRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterClientQuotasRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterClientQuotasRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterClientQuotasRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -30552,8 +33557,9 @@ func (v *AlterClientQuotasRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterClientQuotasRequestEntry, l)
+			a = append(a, make([]AlterClientQuotasRequestEntry, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -30571,8 +33577,9 @@ func (v *AlterClientQuotasRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterClientQuotasRequestEntryEntity, l)
+					a = append(a, make([]AlterClientQuotasRequestEntryEntity, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -30580,19 +33587,35 @@ func (v *AlterClientQuotasRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Type = v
 					}
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Name = v
 					}
@@ -30615,8 +33638,9 @@ func (v *AlterClientQuotasRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterClientQuotasRequestEntryOp, l)
+					a = append(a, make([]AlterClientQuotasRequestEntryOp, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -30624,10 +33648,18 @@ func (v *AlterClientQuotasRequest) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Key = v
 					}
@@ -30839,6 +33871,14 @@ func (v *AlterClientQuotasResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterClientQuotasResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterClientQuotasResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterClientQuotasResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -30862,8 +33902,9 @@ func (v *AlterClientQuotasResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterClientQuotasResponseEntry, l)
+			a = append(a, make([]AlterClientQuotasResponseEntry, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -30876,9 +33917,17 @@ func (v *AlterClientQuotasResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -30894,8 +33943,9 @@ func (v *AlterClientQuotasResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterClientQuotasResponseEntryEntity, l)
+					a = append(a, make([]AlterClientQuotasResponseEntryEntity, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -30903,19 +33953,35 @@ func (v *AlterClientQuotasResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Type = v
 					}
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.Name = v
 					}
@@ -31053,6 +34119,14 @@ func (v *DescribeUserSCRAMCredentialsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeUserSCRAMCredentialsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeUserSCRAMCredentialsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -31075,8 +34149,9 @@ func (v *DescribeUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeUserSCRAMCredentialsRequestUser, l)
+			a = append(a, make([]DescribeUserSCRAMCredentialsRequestUser, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -31084,10 +34159,18 @@ func (v *DescribeUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Name = v
 			}
@@ -31303,6 +34386,14 @@ func (v *DescribeUserSCRAMCredentialsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeUserSCRAMCredentialsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeUserSCRAMCredentialsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -31321,9 +34412,17 @@ func (v *DescribeUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -31339,8 +34438,9 @@ func (v *DescribeUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeUserSCRAMCredentialsResponseResult, l)
+			a = append(a, make([]DescribeUserSCRAMCredentialsResponseResult, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -31348,10 +34448,18 @@ func (v *DescribeUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.User = v
 			}
@@ -31362,9 +34470,17 @@ func (v *DescribeUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -31380,8 +34496,9 @@ func (v *DescribeUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeUserSCRAMCredentialsResponseResultCredentialInfo, l)
+					a = append(a, make([]DescribeUserSCRAMCredentialsResponseResultCredentialInfo, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -31622,6 +34739,14 @@ func (v *AlterUserSCRAMCredentialsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterUserSCRAMCredentialsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterUserSCRAMCredentialsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -31641,8 +34766,9 @@ func (v *AlterUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterUserSCRAMCredentialsRequestDeletion, l)
+			a = append(a, make([]AlterUserSCRAMCredentialsRequestDeletion, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -31650,10 +34776,18 @@ func (v *AlterUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Name = v
 			}
@@ -31680,8 +34814,9 @@ func (v *AlterUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterUserSCRAMCredentialsRequestUpsertion, l)
+			a = append(a, make([]AlterUserSCRAMCredentialsRequestUpsertion, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -31689,10 +34824,18 @@ func (v *AlterUserSCRAMCredentialsRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Name = v
 			}
@@ -31865,6 +35008,14 @@ func (v *AlterUserSCRAMCredentialsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterUserSCRAMCredentialsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterUserSCRAMCredentialsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -31888,8 +35039,9 @@ func (v *AlterUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterUserSCRAMCredentialsResponseResult, l)
+			a = append(a, make([]AlterUserSCRAMCredentialsResponseResult, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -31897,10 +35049,18 @@ func (v *AlterUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.User = v
 			}
@@ -31911,9 +35071,17 @@ func (v *AlterUserSCRAMCredentialsResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -32118,6 +35286,14 @@ func (v *VoteRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *VoteRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *VoteRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *VoteRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -32128,9 +35304,17 @@ func (v *VoteRequest) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ClusterID = v
 	}
@@ -32146,8 +35330,9 @@ func (v *VoteRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]VoteRequestTopic, l)
+			a = append(a, make([]VoteRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -32155,10 +35340,18 @@ func (v *VoteRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -32174,8 +35367,9 @@ func (v *VoteRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]VoteRequestTopicPartition, l)
+					a = append(a, make([]VoteRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -32382,6 +35576,14 @@ func (v *VoteResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *VoteResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *VoteResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *VoteResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -32405,8 +35607,9 @@ func (v *VoteResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]VoteResponseTopic, l)
+			a = append(a, make([]VoteResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -32414,10 +35617,18 @@ func (v *VoteResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -32433,8 +35644,9 @@ func (v *VoteResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]VoteResponseTopicPartition, l)
+					a = append(a, make([]VoteResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -32614,13 +35826,26 @@ func (v *BeginQuorumEpochRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *BeginQuorumEpochRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *BeginQuorumEpochRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *BeginQuorumEpochRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
 	_ = version
 	s := v
 	{
-		v := b.NullableString()
+		var v *string
+		if unsafe {
+			v = b.UnsafeNullableString()
+		} else {
+			v = b.NullableString()
+		}
 		s.ClusterID = v
 	}
 	{
@@ -32631,15 +35856,21 @@ func (v *BeginQuorumEpochRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]BeginQuorumEpochRequestTopic, l)
+			a = append(a, make([]BeginQuorumEpochRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -32650,8 +35881,9 @@ func (v *BeginQuorumEpochRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]BeginQuorumEpochRequestTopicPartition, l)
+					a = append(a, make([]BeginQuorumEpochRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -32808,6 +36040,14 @@ func (v *BeginQuorumEpochResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *BeginQuorumEpochResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *BeginQuorumEpochResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *BeginQuorumEpochResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -32825,15 +36065,21 @@ func (v *BeginQuorumEpochResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]BeginQuorumEpochResponseTopic, l)
+			a = append(a, make([]BeginQuorumEpochResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -32844,8 +36090,9 @@ func (v *BeginQuorumEpochResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]BeginQuorumEpochResponseTopicPartition, l)
+					a = append(a, make([]BeginQuorumEpochResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -33027,13 +36274,26 @@ func (v *EndQuorumEpochRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *EndQuorumEpochRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *EndQuorumEpochRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *EndQuorumEpochRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
 	_ = version
 	s := v
 	{
-		v := b.NullableString()
+		var v *string
+		if unsafe {
+			v = b.UnsafeNullableString()
+		} else {
+			v = b.NullableString()
+		}
 		s.ClusterID = v
 	}
 	{
@@ -33044,15 +36304,21 @@ func (v *EndQuorumEpochRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]EndQuorumEpochRequestTopic, l)
+			a = append(a, make([]EndQuorumEpochRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -33063,8 +36329,9 @@ func (v *EndQuorumEpochRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]EndQuorumEpochRequestTopicPartition, l)
+					a = append(a, make([]EndQuorumEpochRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -33090,8 +36357,9 @@ func (v *EndQuorumEpochRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -33239,6 +36507,14 @@ func (v *EndQuorumEpochResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *EndQuorumEpochResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *EndQuorumEpochResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *EndQuorumEpochResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -33256,15 +36532,21 @@ func (v *EndQuorumEpochResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]EndQuorumEpochResponseTopic, l)
+			a = append(a, make([]EndQuorumEpochResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
 			v.Default()
 			s := v
 			{
-				v := b.String()
+				var v string
+				if unsafe {
+					v = b.UnsafeString()
+				} else {
+					v = b.String()
+				}
 				s.Topic = v
 			}
 			{
@@ -33275,8 +36557,9 @@ func (v *EndQuorumEpochResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]EndQuorumEpochResponseTopicPartition, l)
+					a = append(a, make([]EndQuorumEpochResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -33483,6 +36766,14 @@ func (v *DescribeQuorumRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeQuorumRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeQuorumRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeQuorumRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -33502,8 +36793,9 @@ func (v *DescribeQuorumRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeQuorumRequestTopic, l)
+			a = append(a, make([]DescribeQuorumRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -33511,10 +36803,18 @@ func (v *DescribeQuorumRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -33530,8 +36830,9 @@ func (v *DescribeQuorumRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeQuorumRequestTopicPartition, l)
+					a = append(a, make([]DescribeQuorumRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -33780,6 +37081,14 @@ func (v *DescribeQuorumResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeQuorumResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeQuorumResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeQuorumResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -33803,8 +37112,9 @@ func (v *DescribeQuorumResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeQuorumResponseTopic, l)
+			a = append(a, make([]DescribeQuorumResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -33812,10 +37122,18 @@ func (v *DescribeQuorumResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -33831,8 +37149,9 @@ func (v *DescribeQuorumResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeQuorumResponseTopicPartition, l)
+					a = append(a, make([]DescribeQuorumResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -33870,8 +37189,9 @@ func (v *DescribeQuorumResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]DescribeQuorumResponseTopicPartitionReplicaState, l)
+							a = append(a, make([]DescribeQuorumResponseTopicPartitionReplicaState, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -33904,8 +37224,9 @@ func (v *DescribeQuorumResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]DescribeQuorumResponseTopicPartitionReplicaState, l)
+							a = append(a, make([]DescribeQuorumResponseTopicPartitionReplicaState, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -34148,6 +37469,14 @@ func (v *AlterPartitionRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterPartitionRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterPartitionRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterPartitionRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -34175,8 +37504,9 @@ func (v *AlterPartitionRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterPartitionRequestTopic, l)
+			a = append(a, make([]AlterPartitionRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -34184,10 +37514,18 @@ func (v *AlterPartitionRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -34203,8 +37541,9 @@ func (v *AlterPartitionRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterPartitionRequestTopicPartition, l)
+					a = append(a, make([]AlterPartitionRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -34230,8 +37569,9 @@ func (v *AlterPartitionRequest) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -34471,6 +37811,14 @@ func (v *AlterPartitionResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AlterPartitionResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AlterPartitionResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AlterPartitionResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -34498,8 +37846,9 @@ func (v *AlterPartitionResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]AlterPartitionResponseTopic, l)
+			a = append(a, make([]AlterPartitionResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -34507,10 +37856,18 @@ func (v *AlterPartitionResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -34526,8 +37883,9 @@ func (v *AlterPartitionResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]AlterPartitionResponseTopicPartition, l)
+					a = append(a, make([]AlterPartitionResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -34561,8 +37919,9 @@ func (v *AlterPartitionResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -34740,6 +38099,14 @@ func (v *UpdateFeaturesRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *UpdateFeaturesRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *UpdateFeaturesRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *UpdateFeaturesRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -34763,8 +38130,9 @@ func (v *UpdateFeaturesRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]UpdateFeaturesRequestFeatureUpdate, l)
+			a = append(a, make([]UpdateFeaturesRequestFeatureUpdate, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -34772,10 +38140,18 @@ func (v *UpdateFeaturesRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Feature = v
 			}
@@ -34944,6 +38320,14 @@ func (v *UpdateFeaturesResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *UpdateFeaturesResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *UpdateFeaturesResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *UpdateFeaturesResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -34962,9 +38346,17 @@ func (v *UpdateFeaturesResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -34980,8 +38372,9 @@ func (v *UpdateFeaturesResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]UpdateFeaturesResponseResult, l)
+			a = append(a, make([]UpdateFeaturesResponseResult, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -34989,10 +38382,18 @@ func (v *UpdateFeaturesResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Feature = v
 			}
@@ -35003,9 +38404,17 @@ func (v *UpdateFeaturesResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ErrorMessage = v
 			}
@@ -35116,6 +38525,14 @@ func (v *EnvelopeRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *EnvelopeRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *EnvelopeRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *EnvelopeRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -35227,6 +38644,14 @@ func (v *EnvelopeResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *EnvelopeResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *EnvelopeResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *EnvelopeResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -35511,6 +38936,14 @@ func (v *FetchSnapshotRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *FetchSnapshotRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *FetchSnapshotRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *FetchSnapshotRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -35538,8 +38971,9 @@ func (v *FetchSnapshotRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]FetchSnapshotRequestTopic, l)
+			a = append(a, make([]FetchSnapshotRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -35547,10 +38981,18 @@ func (v *FetchSnapshotRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -35566,8 +39008,9 @@ func (v *FetchSnapshotRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]FetchSnapshotRequestTopicPartition, l)
+					a = append(a, make([]FetchSnapshotRequestTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -35624,9 +39067,17 @@ func (v *FetchSnapshotRequest) ReadFrom(src []byte) error {
 				b := kbin.Reader{Src: b.Span(int(b.Uvarint()))}
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.ClusterID = v
 				if err := b.Complete(); err != nil {
@@ -35942,6 +39393,14 @@ func (v *FetchSnapshotResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *FetchSnapshotResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *FetchSnapshotResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *FetchSnapshotResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -35969,8 +39428,9 @@ func (v *FetchSnapshotResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]FetchSnapshotResponseTopic, l)
+			a = append(a, make([]FetchSnapshotResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -35978,10 +39438,18 @@ func (v *FetchSnapshotResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -35997,8 +39465,9 @@ func (v *FetchSnapshotResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]FetchSnapshotResponseTopicPartition, l)
+					a = append(a, make([]FetchSnapshotResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -36160,6 +39629,14 @@ func (v *DescribeClusterRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeClusterRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeClusterRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeClusterRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -36357,6 +39834,14 @@ func (v *DescribeClusterResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeClusterResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeClusterResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeClusterResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -36375,18 +39860,34 @@ func (v *DescribeClusterResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.ClusterID = v
 	}
@@ -36406,8 +39907,9 @@ func (v *DescribeClusterResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeClusterResponseBroker, l)
+			a = append(a, make([]DescribeClusterResponseBroker, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -36419,10 +39921,18 @@ func (v *DescribeClusterResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Host = v
 			}
@@ -36433,9 +39943,17 @@ func (v *DescribeClusterResponse) ReadFrom(src []byte) error {
 			{
 				var v *string
 				if isFlexible {
-					v = b.CompactNullableString()
+					if unsafe {
+						v = b.UnsafeCompactNullableString()
+					} else {
+						v = b.CompactNullableString()
+					}
 				} else {
-					v = b.NullableString()
+					if unsafe {
+						v = b.UnsafeNullableString()
+					} else {
+						v = b.NullableString()
+					}
 				}
 				s.Rack = v
 			}
@@ -36585,6 +40103,14 @@ func (v *DescribeProducersRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeProducersRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeProducersRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeProducersRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -36604,8 +40130,9 @@ func (v *DescribeProducersRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeProducersRequestTopic, l)
+			a = append(a, make([]DescribeProducersRequestTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -36613,10 +40140,18 @@ func (v *DescribeProducersRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -36632,8 +40167,9 @@ func (v *DescribeProducersRequest) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]int32, l)
+					a = append(a, make([]int32, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := b.Int32()
@@ -36916,6 +40452,14 @@ func (v *DescribeProducersResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeProducersResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeProducersResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeProducersResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -36939,8 +40483,9 @@ func (v *DescribeProducersResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeProducersResponseTopic, l)
+			a = append(a, make([]DescribeProducersResponseTopic, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -36948,10 +40493,18 @@ func (v *DescribeProducersResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Topic = v
 			}
@@ -36967,8 +40520,9 @@ func (v *DescribeProducersResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeProducersResponseTopicPartition, l)
+					a = append(a, make([]DescribeProducersResponseTopicPartition, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -36985,9 +40539,17 @@ func (v *DescribeProducersResponse) ReadFrom(src []byte) error {
 					{
 						var v *string
 						if isFlexible {
-							v = b.CompactNullableString()
+							if unsafe {
+								v = b.UnsafeCompactNullableString()
+							} else {
+								v = b.CompactNullableString()
+							}
 						} else {
-							v = b.NullableString()
+							if unsafe {
+								v = b.UnsafeNullableString()
+							} else {
+								v = b.NullableString()
+							}
 						}
 						s.ErrorMessage = v
 					}
@@ -37003,8 +40565,9 @@ func (v *DescribeProducersResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]DescribeProducersResponseTopicPartitionActiveProducer, l)
+							a = append(a, make([]DescribeProducersResponseTopicPartitionActiveProducer, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := &a[i]
@@ -37292,6 +40855,14 @@ func (v *BrokerRegistrationRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *BrokerRegistrationRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *BrokerRegistrationRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *BrokerRegistrationRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -37305,10 +40876,18 @@ func (v *BrokerRegistrationRequest) ReadFrom(src []byte) error {
 	}
 	{
 		var v string
-		if isFlexible {
-			v = b.CompactString()
+		if unsafe {
+			if isFlexible {
+				v = b.UnsafeCompactString()
+			} else {
+				v = b.UnsafeString()
+			}
 		} else {
-			v = b.String()
+			if isFlexible {
+				v = b.CompactString()
+			} else {
+				v = b.String()
+			}
 		}
 		s.ClusterID = v
 	}
@@ -37328,8 +40907,9 @@ func (v *BrokerRegistrationRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]BrokerRegistrationRequestListener, l)
+			a = append(a, make([]BrokerRegistrationRequestListener, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -37337,19 +40917,35 @@ func (v *BrokerRegistrationRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Name = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Host = v
 			}
@@ -37380,8 +40976,9 @@ func (v *BrokerRegistrationRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]BrokerRegistrationRequestFeature, l)
+			a = append(a, make([]BrokerRegistrationRequestFeature, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -37389,10 +40986,18 @@ func (v *BrokerRegistrationRequest) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.Name = v
 			}
@@ -37414,9 +41019,17 @@ func (v *BrokerRegistrationRequest) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.Rack = v
 	}
@@ -37506,6 +41119,14 @@ func (v *BrokerRegistrationResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *BrokerRegistrationResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *BrokerRegistrationResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *BrokerRegistrationResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -37631,6 +41252,14 @@ func (v *BrokerHeartbeatRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *BrokerHeartbeatRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *BrokerHeartbeatRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *BrokerHeartbeatRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -37756,6 +41385,14 @@ func (v *BrokerHeartbeatResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *BrokerHeartbeatResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *BrokerHeartbeatResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *BrokerHeartbeatResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -37859,6 +41496,14 @@ func (v *UnregisterBrokerRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *UnregisterBrokerRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *UnregisterBrokerRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *UnregisterBrokerRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -37955,6 +41600,14 @@ func (v *UnregisterBrokerResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *UnregisterBrokerResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *UnregisterBrokerResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *UnregisterBrokerResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -37973,9 +41626,17 @@ func (v *UnregisterBrokerResponse) ReadFrom(src []byte) error {
 	{
 		var v *string
 		if isFlexible {
-			v = b.CompactNullableString()
+			if unsafe {
+				v = b.UnsafeCompactNullableString()
+			} else {
+				v = b.CompactNullableString()
+			}
 		} else {
-			v = b.NullableString()
+			if unsafe {
+				v = b.UnsafeNullableString()
+			} else {
+				v = b.NullableString()
+			}
 		}
 		s.ErrorMessage = v
 	}
@@ -38066,6 +41727,14 @@ func (v *DescribeTransactionsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeTransactionsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeTransactionsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeTransactionsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -38085,15 +41754,24 @@ func (v *DescribeTransactionsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -38338,6 +42016,14 @@ func (v *DescribeTransactionsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *DescribeTransactionsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *DescribeTransactionsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *DescribeTransactionsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -38361,8 +42047,9 @@ func (v *DescribeTransactionsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]DescribeTransactionsResponseTransactionState, l)
+			a = append(a, make([]DescribeTransactionsResponseTransactionState, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -38374,19 +42061,35 @@ func (v *DescribeTransactionsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.TransactionalID = v
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.State = v
 			}
@@ -38418,8 +42121,9 @@ func (v *DescribeTransactionsResponse) ReadFrom(src []byte) error {
 				if !b.Ok() {
 					return b.Complete()
 				}
+				a = a[:0]
 				if l > 0 {
-					a = make([]DescribeTransactionsResponseTransactionStateTopic, l)
+					a = append(a, make([]DescribeTransactionsResponseTransactionStateTopic, l)...)
 				}
 				for i := int32(0); i < l; i++ {
 					v := &a[i]
@@ -38427,10 +42131,18 @@ func (v *DescribeTransactionsResponse) ReadFrom(src []byte) error {
 					s := v
 					{
 						var v string
-						if isFlexible {
-							v = b.CompactString()
+						if unsafe {
+							if isFlexible {
+								v = b.UnsafeCompactString()
+							} else {
+								v = b.UnsafeString()
+							}
 						} else {
-							v = b.String()
+							if isFlexible {
+								v = b.CompactString()
+							} else {
+								v = b.String()
+							}
 						}
 						s.Topic = v
 					}
@@ -38446,8 +42158,9 @@ func (v *DescribeTransactionsResponse) ReadFrom(src []byte) error {
 						if !b.Ok() {
 							return b.Complete()
 						}
+						a = a[:0]
 						if l > 0 {
-							a = make([]int32, l)
+							a = append(a, make([]int32, l)...)
 						}
 						for i := int32(0); i < l; i++ {
 							v := b.Int32()
@@ -38577,6 +42290,14 @@ func (v *ListTransactionsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListTransactionsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListTransactionsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListTransactionsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -38596,15 +42317,24 @@ func (v *ListTransactionsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -38623,8 +42353,9 @@ func (v *ListTransactionsRequest) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]int64, l)
+			a = append(a, make([]int64, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := b.Int64()
@@ -38799,6 +42530,14 @@ func (v *ListTransactionsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *ListTransactionsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *ListTransactionsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *ListTransactionsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -38826,15 +42565,24 @@ func (v *ListTransactionsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]string, l)
+			a = append(a, make([]string, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			var v string
-			if isFlexible {
-				v = b.CompactString()
+			if unsafe {
+				if isFlexible {
+					v = b.UnsafeCompactString()
+				} else {
+					v = b.UnsafeString()
+				}
 			} else {
-				v = b.String()
+				if isFlexible {
+					v = b.CompactString()
+				} else {
+					v = b.String()
+				}
 			}
 			a[i] = v
 		}
@@ -38853,8 +42601,9 @@ func (v *ListTransactionsResponse) ReadFrom(src []byte) error {
 		if !b.Ok() {
 			return b.Complete()
 		}
+		a = a[:0]
 		if l > 0 {
-			a = make([]ListTransactionsResponseTransactionState, l)
+			a = append(a, make([]ListTransactionsResponseTransactionState, l)...)
 		}
 		for i := int32(0); i < l; i++ {
 			v := &a[i]
@@ -38862,10 +42611,18 @@ func (v *ListTransactionsResponse) ReadFrom(src []byte) error {
 			s := v
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.TransactionalID = v
 			}
@@ -38875,10 +42632,18 @@ func (v *ListTransactionsResponse) ReadFrom(src []byte) error {
 			}
 			{
 				var v string
-				if isFlexible {
-					v = b.CompactString()
+				if unsafe {
+					if isFlexible {
+						v = b.UnsafeCompactString()
+					} else {
+						v = b.UnsafeString()
+					}
 				} else {
-					v = b.String()
+					if isFlexible {
+						v = b.CompactString()
+					} else {
+						v = b.String()
+					}
 				}
 				s.TransactionState = v
 			}
@@ -38975,6 +42740,14 @@ func (v *AllocateProducerIDsRequest) AppendTo(dst []byte) []byte {
 }
 
 func (v *AllocateProducerIDsRequest) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AllocateProducerIDsRequest) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AllocateProducerIDsRequest) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version
@@ -39082,6 +42855,14 @@ func (v *AllocateProducerIDsResponse) AppendTo(dst []byte) []byte {
 }
 
 func (v *AllocateProducerIDsResponse) ReadFrom(src []byte) error {
+	return v.readFrom(src, false)
+}
+
+func (v *AllocateProducerIDsResponse) UnsafeReadFrom(src []byte) error {
+	return v.readFrom(src, true)
+}
+
+func (v *AllocateProducerIDsResponse) readFrom(src []byte, unsafe bool) error {
 	v.Default()
 	b := kbin.Reader{Src: src}
 	version := v.Version

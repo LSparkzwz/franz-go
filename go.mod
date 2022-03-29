@@ -2,6 +2,8 @@ module github.com/twmb/franz-go
 
 go 1.15
 
+replace github.com/twmb/franz-go/pkg/kmsg => ./pkg/kmsg
+
 require (
 	github.com/google/go-cmp v0.5.7
 	github.com/jcmturner/gokrb5/v8 v8.4.2
