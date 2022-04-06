@@ -7,7 +7,7 @@ require (
 	github.com/jcmturner/gokrb5/v8 v8.4.2
 	github.com/klauspost/compress v1.15.1
 	github.com/pierrec/lz4/v4 v4.1.14
-	github.com/LSparkzwz/franz-go/pkg/kmsg v1.0.1-0.20220406142558-255af01dfa77
+	github.com/LSparkzwz/franz-go/pkg/kmsg v1.4.3
 	github.com/twmb/go-rbtree v1.0.0
 	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
