@@ -2,11 +2,11 @@ franz-go - A complete Apache Kafka client written in Go
 ===
 
 [![GoDev](https://img.shields.io/static/v1?label=godev&message=reference&color=00add8)][godev]
-![GitHub](https://img.shields.io/github/license/twmb/franz-go)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/twmb/franz-go)
+![GitHub](https://img.shields.io/github/license/LSparkzwz/franz-go)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/LSparkzwz/franz-go)
 [![Discord Chat](https://img.shields.io/badge/discord-online-brightgreen.svg)](https://discord.gg/K4R5c8zsMS)
 
-[godev]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo
+[godev]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo
 
 Franz-go is an all-encompassing Apache Kafka client fully written Go. This library aims to provide **every Kafka feature** from
 Apache Kafka v0.8.0 onward. It has support for transactions, regex topic consuming, the latest partitioning strategies,
@@ -139,7 +139,7 @@ In alphabetical order,
 * [Unistack](https://unistack.org) (Cloud Management System)
 
 If you use this library and want on the list above, please either open a PR
-or comment on [#142](https://github.com/twmb/franz-go/issues/142)!
+or comment on [#142](https://github.com/LSparkzwz/franz-go/issues/142)!
 
 ## Version Pinning
 
@@ -164,7 +164,7 @@ update roll.
 **Note** there exists plug-in packages that allow you to easily add prometheus
 metrics, go-metrics, zap logging, etc. to your client! See the [plugin](./plugin)
 directory for more information! These plugins are provided under dedicated
-modules, e.g. `github.com/twmb/franz-go/plugin/kprom@v0.1.0`.
+modules, e.g. `github.com/LSparkzwz/franz-go/plugin/kprom@v0.1.0`.
 
 The franz-go client takes a neutral approach to metrics by providing hooks
 that you can use to plug in your own metrics.

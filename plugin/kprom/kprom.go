@@ -40,7 +40,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/twmb/franz-go/pkg/kgo"
+	"github.com/LSparkzwz/franz-go/pkg/kgo"
 )
 
 var ( // interface checks to ensure we implement the hooks properly

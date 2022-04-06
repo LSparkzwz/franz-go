@@ -8,8 +8,8 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.30.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
-	github.com/twmb/franz-go v0.8.3
+	github.com/LSparkzwz/franz-go v0.8.3
 	google.golang.org/protobuf v1.27.1 // indirect
 )
 
-replace github.com/twmb/franz-go => ../../..
+replace github.com/LSparkzwz/franz-go => ../../..

@@ -10,8 +10,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/twmb/franz-go/pkg/kgo"
-	"github.com/twmb/franz-go/plugin/kzap"
+	"github.com/LSparkzwz/franz-go/pkg/kgo"
+	"github.com/LSparkzwz/franz-go/plugin/kzap"
 )
 
 var (

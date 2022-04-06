@@ -5,8 +5,8 @@ import (
 	"hash/crc32"
 	"testing"
 
-	"github.com/twmb/franz-go/pkg/kbin"
-	"github.com/twmb/franz-go/pkg/kmsg"
+	"github.com/LSparkzwz/franz-go/pkg/kbin"
+	"github.com/LSparkzwz/franz-go/pkg/kmsg"
 )
 
 // This file contains golden tests against kmsg AppendTo's to ensure our custom

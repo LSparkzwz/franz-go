@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/twmb/franz-go/pkg/kerr"
-	"github.com/twmb/franz-go/pkg/kgo"
+	"github.com/LSparkzwz/franz-go/pkg/kerr"
+	"github.com/LSparkzwz/franz-go/pkg/kgo"
 )
 
 func startProducing(ctx context.Context, brokers []string, topic string) {

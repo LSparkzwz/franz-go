@@ -7,8 +7,8 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/twmb/franz-go/pkg/kerr"
-	"github.com/twmb/franz-go/pkg/kmsg"
+	"github.com/LSparkzwz/franz-go/pkg/kerr"
+	"github.com/LSparkzwz/franz-go/pkg/kmsg"
 )
 
 // GroupMemberMetadata is the metadata that a client sent in a JoinGroup request.

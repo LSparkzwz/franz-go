@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"strings"
 
-	"github.com/twmb/franz-go/pkg/kgo"
+	"github.com/LSparkzwz/franz-go/pkg/kgo"
 )
 
 var (

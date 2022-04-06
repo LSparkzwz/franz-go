@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/twmb/franz-go/pkg/sasl"
+	"github.com/LSparkzwz/franz-go/pkg/sasl"
 )
 
 // Auth contains an AWS AccessKey and SecretKey for authentication.

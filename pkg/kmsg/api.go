@@ -29,7 +29,7 @@ package kmsg
 import (
 	"context"
 
-	"github.com/twmb/franz-go/pkg/kmsg/internal/kbin"
+	"github.com/LSparkzwz/franz-go/pkg/kmsg/internal/kbin"
 )
 
 // GroupMemberMetadata is a type alias for ConsumerMemberMetadata. This is the

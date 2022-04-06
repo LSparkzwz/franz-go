@@ -37,15 +37,15 @@ Lastly, if you are producing asynchronously in batches and only want to know
 whether the batch errored at all, there exists a [`FirstErrPromise`][9] type to
 help eliminate promise boilerplate.
 
-[1]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#Client.Produce
-[2]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#Client.ProduceSync
-[3]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#GroupTransactSession
-[4]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#Record
-[5]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#StringRecord
-[6]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#KeyStringRecord
-[7]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#SliceRecord
-[8]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#KeySliceRecord
-[9]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#FirstErrPromise
+[1]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#Client.Produce
+[2]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#Client.ProduceSync
+[3]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#GroupTransactSession
+[4]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#Record
+[5]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#StringRecord
+[6]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#KeyStringRecord
+[7]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#SliceRecord
+[8]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#KeySliceRecord
+[9]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#FirstErrPromise
 
 ### Record reliability
 
@@ -53,7 +53,7 @@ By default, kgo uses idempotent production. This can be disabled with the
 [`DisableIdempotentWrite`][10] option, but this should really only be necessary
 if you want to produce with no ack required or with only leader acks required.
 
-[10]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#DisableIdempotentWrite
+[10]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#DisableIdempotentWrite
 
 The default is to always retry records forever, but this can be dropped with
 the [`ProduceRetries`][11] and [`RecordTimeout`][12] options, as well as with
@@ -64,8 +64,8 @@ it received a successful response from its last produce attempt (even if that
 response indicated an error on that partition). If a record is ever failed, all
 records buffered on the same partition are failed.
 
-[11]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#ProduceRetries
-[12]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#RecordTimeout
+[11]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#ProduceRetries
+[12]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#RecordTimeout
 
 ### Exactly once semantics
 
@@ -93,10 +93,10 @@ throughput scenario it may be worth it to add lingering.
 
 As well, it is possible to completely disable auto-flushing and instead only
 have manual flushes with the
-[`ManualFlushing`](https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#ManualFlushing)
+[`ManualFlushing`](https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#ManualFlushing)
 option. This allows you to buffer as much as you want before flushing in one
 go. However, with this option, you likely want to consider the
-[`MaxBufferedRecords`](https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#MaxBufferedRecords)
+[`MaxBufferedRecords`](https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#MaxBufferedRecords)
 option.
 
 ## Consuming
@@ -109,10 +109,10 @@ To consume partitions directly, use [`ConsumeTopics`][13] or [`ConsumePartitions
 `ConsumeTopics` with [`ConsumerGroup`][14] for group consuming or [`NewGroupTransactSession`][15]
 for group consuming for EOS.
 
-[13]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#Client.ConsumeTopics
-[a]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#Client.ConsumePartitions
-[14]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#Client.ConsumerGroup
-[15]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#NewGroupTransactSession
+[13]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#Client.ConsumeTopics
+[a]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#Client.ConsumePartitions
+[14]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#Client.ConsumerGroup
+[15]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#NewGroupTransactSession
 
 ### Consumer groups
 
@@ -128,8 +128,8 @@ any errors encountered, but this can be overridden with the
 [`CommitCallback`][16] option or by disabling autocommit and instead committing
 yourself.
 
-[16]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#OnRevoked
-[17]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#CommitCallback
+[16]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#OnRevoked
+[17]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#CommitCallback
 
 #### Offset management
 
@@ -168,7 +168,7 @@ may want to use your own custom commit callback.
 Alternatively, you can disable autocommitting with [`DisableAutoCommit`][19]
 and instead use a custom `OnRevoked`.
 
-[19]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#DisableAutoCommit
+[19]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#DisableAutoCommit
 
 In your custom revoke, you can guard a revoked variable with a mutex. Before
 committing, check this revoked variable and do not commit if it has been set.
@@ -176,7 +176,7 @@ For some hints as to how to do this properly, check how
 [`GroupTransactSession`][20] is implemented (albeit it is more complicated due
 to handling transactions).
 
-[20]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#GroupTransactSession
+[20]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#GroupTransactSession
 
 ##### With transactions
 
@@ -218,5 +218,5 @@ conveys a host of other benefits; see the KIP for more details. To use static
 membership, your cluster must be at least 2.4.0, and you can use the
 [`InstanceID`][23] option.
 
-[23]: https://pkg.go.dev/github.com/twmb/franz-go/pkg/kgo#InstanceID
+[23]: https://pkg.go.dev/github.com/LSparkzwz/franz-go/pkg/kgo#InstanceID
 

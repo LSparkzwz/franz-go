@@ -7,7 +7,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/twmb/franz-go/pkg/kerr"
+	"github.com/LSparkzwz/franz-go/pkg/kerr"
 )
 
 func dupmsi32(m map[string]int32) map[string]int32 {

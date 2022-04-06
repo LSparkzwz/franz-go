@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/twmb/franz-go/pkg/kerr"
-	"github.com/twmb/franz-go/pkg/kgo"
-	"github.com/twmb/franz-go/pkg/kmsg"
+	"github.com/LSparkzwz/franz-go/pkg/kerr"
+	"github.com/LSparkzwz/franz-go/pkg/kgo"
+	"github.com/LSparkzwz/franz-go/pkg/kmsg"
 )
 
 // AuthError can be returned from requests for resources that you are not

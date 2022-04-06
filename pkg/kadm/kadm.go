@@ -55,7 +55,7 @@ package kadm
 import (
 	"sort"
 
-	"github.com/twmb/franz-go/pkg/kgo"
+	"github.com/LSparkzwz/franz-go/pkg/kgo"
 )
 
 // Client is an admin client.

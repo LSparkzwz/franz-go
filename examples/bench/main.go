@@ -14,13 +14,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/twmb/franz-go/plugin/kprom"
+	"github.com/LSparkzwz/franz-go/plugin/kprom"
 	"github.com/twmb/tlscfg"
 
-	"github.com/twmb/franz-go/pkg/kgo"
-	"github.com/twmb/franz-go/pkg/sasl/aws"
-	"github.com/twmb/franz-go/pkg/sasl/plain"
-	"github.com/twmb/franz-go/pkg/sasl/scram"
+	"github.com/LSparkzwz/franz-go/pkg/kgo"
+	"github.com/LSparkzwz/franz-go/pkg/sasl/aws"
+	"github.com/LSparkzwz/franz-go/pkg/sasl/plain"
+	"github.com/LSparkzwz/franz-go/pkg/sasl/scram"
 )
 
 var (

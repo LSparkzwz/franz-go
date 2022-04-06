@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/twmb/franz-go/pkg/kerr"
-	"github.com/twmb/franz-go/pkg/kmsg"
+	"github.com/LSparkzwz/franz-go/pkg/kerr"
+	"github.com/LSparkzwz/franz-go/pkg/kmsg"
 )
 
 // TransactionEndTry is simply a named bool.

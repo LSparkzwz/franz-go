@@ -3,7 +3,7 @@ package sticky
 import (
 	"testing"
 
-	"github.com/twmb/franz-go/pkg/kmsg"
+	"github.com/LSparkzwz/franz-go/pkg/kmsg"
 )
 
 type udBuilder struct {
