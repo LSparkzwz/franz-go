@@ -197,7 +197,6 @@ func (cl *Client) newBroker(nodeID int32, host string, port int32, rack *string)
 // stopForever permanently disables this broker.
 func (b *broker) stopForever() {
 	if atomic.SwapInt32(&b.dead, 1) == 1 {
-		return
 	}
 
 	b.reqs.die() // no more pushing
@@ -578,7 +577,7 @@ func (b *broker) connect(ctx context.Context) (net.Conn, error) {
 	})
 	if err != nil {
 		if !errors.Is(err, ErrClientClosed) && !strings.Contains(err.Error(), "operation was canceled") {
-			b.cl.cfg.logger.Log(LogLevelWarn, "unable to open connection to broker", "addr", b.addr, "broker", logID(b.meta.NodeID), "err", err)
+			b.cl.cfg.logger.Log(LogLevelWarn, "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "addr", b.addr, "broker", logID(b.meta.NodeID), "err", err)
 		}
 		return nil, fmt.Errorf("unable to dial: %w", err)
 	}
